@@ -1,6 +1,6 @@
 header {
-  --logo-width: 40px;
-  --logo-height: 40px;
+  --logo-width: 148px;
+  --logo-height: 16px;
   --mega-columns: 4;
 
   display: block;
@@ -39,6 +39,7 @@ header {
       "nav"
       "actions";
     grid-template-rows: var(--header-height) auto 1fr;
+    align-items: baseline;
   }
 
   .action-wrapper {
