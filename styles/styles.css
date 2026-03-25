@@ -313,6 +313,7 @@
 
   /* brand colors */
   --color-amtrak-teal: #167fa6;
+  --color-amtrak-teal-hover: #1ca1d3;
   --color-amtrak-medium-blue: #003a60;
   --color-amtrak-dark-blue: #002436;
 
@@ -390,6 +391,7 @@ a {
     font-weight: 500;
     text-decoration: none;
     border: 2px solid;
+    border-radius: 3px;
     padding: 8px 12px;
     box-sizing: border-box;
 
@@ -410,11 +412,19 @@ a {
 
   &.btn-primary {
     color: var(--color-background);
-    background-color: var(--color-text);
+    background-color: var(--color-amtrak-teal);
+    border-color: transparent;
+    transition: background-color 0.2s ease-in-out, color 0.2s ease-in-out;
 
     &.btn-outline {
-      color: var(--color-text);
+      color: var(--color-amtrak-teal);
       background: transparent;
+      border-color: var(--color-amtrak-teal);
+    }
+
+    &:hover {
+      background-color: var(--color-amtrak-teal-hover);
+      color: var(--color-amtrak-medium-blue);
     }
   }
 
