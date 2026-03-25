@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg width="24px" height="24px" viewBox="0 0 24 24" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+    <title>navigation_amtrak_profile_inactive</title>
+    <g id="Ideation-flow" stroke="none" stroke-width="1" fill="none" fill-rule="evenodd">
+        <g id="Homepage-Alert_Banner" transform="translate(-1038.000000, -73.000000)" fill-rule="nonzero" stroke="#002436">
+            <g id="Navigation" transform="translate(935.000000, 74.000000)">
+                <g id="Profile-Icon" transform="translate(104.000000, 0.000000)">
+                    <circle id="Oval-5" cx="11" cy="11" r="11"></circle>
+                    <ellipse id="Oval-5" stroke-width="0.85" cx="11" cy="9.5" rx="4" ry="4.5"></ellipse>
+                    <path d="M3,18.5 C3.41666667,18.0833333 3.83333333,17.6666667 4.25,17.25 C5.0613883,16.4386117 6.11405638,15.9122777 7.25,15.75 C8.30998947,15.5985729 9.1753604,14.8254039 9.44474784,13.789094 L9.51989746,13.5 L9.51989746,13.5" id="Path-5" stroke-width="0.85"></path>
+                    <path d="M12,18.5 C12.4166667,18.0833333 12.8333333,17.6666667 13.25,17.25 C14.0613883,16.4386117 15.1140564,15.9122777 16.25,15.75 C17.3099895,15.5985729 18.1753604,14.8254039 18.4447478,13.789094 L18.5198975,13.5 L18.5198975,13.5" id="Path-5" stroke-width="0.85" transform="translate(15.259949, 16.000000) scale(-1, 1) translate(-15.259949, -16.000000) "></path>
+                </g>
+            </g>
+        </g>
+    </g>
+</svg>

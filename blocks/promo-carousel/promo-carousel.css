@@ -1,0 +1,151 @@
+.promo-carousel {
+  --pc-gap: 20px;
+  --pc-radius: 12px;
+  --pc-arrow-size: 40px;
+
+  max-width: 1200px;
+  margin: 40px auto;
+  padding: 0 24px;
+  box-sizing: border-box;
+}
+
+.pc-container {
+  position: relative;
+}
+
+.pc-track {
+  display: flex;
+  gap: var(--pc-gap);
+  overflow-x: auto;
+  scroll-snap-type: x mandatory;
+  -webkit-overflow-scrolling: touch;
+  scrollbar-width: none;
+}
+
+.pc-track::-webkit-scrollbar {
+  display: none;
+}
+
+.pc-card {
+  flex: 0 0 calc(33.333% - var(--pc-gap) * 2 / 3);
+  scroll-snap-align: start;
+  position: relative;
+  aspect-ratio: 3 / 4;
+  border-radius: var(--pc-radius);
+  overflow: hidden;
+  display: block;
+  text-decoration: none;
+  color: #fff;
+}
+
+.pc-card-img {
+  position: absolute;
+  inset: 0;
+}
+
+.pc-card-img img,
+.pc-card-img picture {
+  display: block;
+  width: 100%;
+  height: 100%;
+}
+
+.pc-card-img picture img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+  transition: transform 0.25s ease-in-out;
+}
+
+.pc-card:hover .pc-card-img picture img {
+  transform: scale(1.05);
+}
+
+.pc-card-overlay {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 20px;
+  background: linear-gradient(to top, rgba(0 0 0 / 60%) 0%, transparent 100%);
+}
+
+.pc-card-text {
+  margin: 0;
+  font-size: 15px;
+  font-weight: 600;
+  line-height: 1.35;
+  color: #fff;
+  max-width: 70%;
+}
+
+.pc-card-arrow {
+  flex-shrink: 0;
+  width: var(--pc-arrow-size);
+  height: var(--pc-arrow-size);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #fff;
+  transition: background 0.15s;
+}
+
+.pc-card-arrow svg {
+  width: var(--pc-arrow-size);
+  height: var(--pc-arrow-size);
+}
+
+
+/* Carousel nav arrows */
+.pc-nav {
+  position: absolute;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 48px;
+  height: 48px;
+  border-radius: 50%;
+  border: none;
+  background: #1a6b7f;
+  color: #fff;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 2;
+  box-shadow: 0 2px 8px rgba(0 0 0 / 20%);
+  transition: background 0.15s;
+}
+
+.pc-nav:hover {
+  background: #12556a;
+}
+
+.pc-nav svg {
+  width: 24px;
+  height: 24px;
+}
+
+.pc-prev {
+  left: -16px;
+}
+
+.pc-next {
+  right: -16px;
+}
+
+@media (width <= 900px) {
+  .pc-card {
+    flex: 0 0 calc(50% - var(--pc-gap) / 2);
+  }
+}
+
+@media (width <= 600px) {
+  .pc-card {
+    flex: 0 0 85%;
+  }
+}

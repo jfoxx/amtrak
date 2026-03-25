@@ -101,6 +101,7 @@
   }
 
   &.container {
+    padding: 40px 0;
     .default-content,
     .block-content {
       max-width: var(--section-container-width);
@@ -117,6 +118,17 @@
 
     &.container-6 {
       --section-container-width: var(--grid-container-width);
+    }
+  }
+
+  &.boxed {
+    .block-content {
+      max-width: var(--section-container-width);
+      margin-inline: auto;
+      background-color: white;
+      border-radius: 10px;
+      overflow: hidden;
+      box-shadow: 0 2px 4px 0 rgba(12, 0, 51, .5);
     }
   }
 
