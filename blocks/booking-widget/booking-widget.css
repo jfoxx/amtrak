@@ -1,0 +1,403 @@
+.booking-widget {
+  --bw-tab-bg: var(--color-amtrak-dark-blue);
+  --bw-tab-active: var(--color-amtrak-teal);
+  --bw-tab-hover: #253f5e;
+  --bw-form-bg: #e8ecef;
+  --bw-find-btn: #8b9a5a;
+  --bw-find-btn-hover: #7d8c4e;
+  --bw-text-light: #fff;
+  --bw-text-dark: #333;
+  --bw-text-muted: #6a7a80;
+  --bw-input-bg: #fff;
+  --bw-input-border: #1a6b7f;
+
+  width: 100%;
+}
+
+.bw-container {
+  width: 100%;
+}
+
+/* Top bar: dark blue tier with trip tabs + points toggle */
+.bw-top-bar {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  background: var(--bw-tab-bg);
+  padding: 0 24px;
+
+  > * {
+    max-width: 1200px;
+  }
+}
+
+.bw-top-bar-inner {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  max-width: 1200px;
+  margin: 0 auto;
+  width: 100%;
+}
+
+/* Trip type tabs */
+.bw-trip-tabs {
+  display: flex;
+  gap: 0;
+}
+
+.bw-trip-tab {
+  position: relative;
+  background: transparent;
+  border: none;
+  color: var(--bw-text-light);
+  font-size: 14px;
+  font-weight: 600;
+  padding: 12px 20px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  letter-spacing: 0.3px;
+  transition: background 0.15s;
+
+  &.is-active {
+    background: var(--bw-tab-active);
+    border-radius: 4px 4px 0 0;
+  }
+
+  &:hover:not(.is-active) {
+    background: var(--bw-tab-hover);
+    border-radius: 4px 4px 0 0;
+  }
+
+  svg {
+    width: 14px;
+    height: 14px;
+    transition: transform 0.2s;
+  }
+
+  &.has-dropdown svg:first-of-type {
+    margin-left: 2px;
+  }
+}
+
+/* Trip type dropdown menu */
+.bw-trip-menu {
+  display: none;
+  position: absolute;
+  top: 100%;
+  left: 0;
+  background: #fff;
+  border-radius: 4px;
+  box-shadow: 0 4px 16px rgb(0 0 0 / 25%);
+  z-index: 100;
+  min-width: 140px;
+  overflow: hidden;
+
+  &.is-open {
+    display: block;
+  }
+}
+
+.bw-trip-option {
+  display: block;
+  width: 100%;
+  background: none;
+  border: none;
+  padding: 10px 16px;
+  text-align: left;
+  font-size: 14px;
+  color: #333;
+  cursor: pointer;
+
+  &:hover {
+    background: #f0f0f0;
+  }
+}
+
+/* Use Points row — right-aligned in gray area */
+.bw-points-row {
+  display: flex;
+  justify-content: flex-end;
+  padding-bottom: 8px;
+}
+
+.bw-points-toggle {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  color: var(--bw-text-dark);
+  font-size: 14px;
+  font-weight: 500;
+}
+
+.bw-toggle {
+  position: relative;
+  width: 44px;
+  height: 24px;
+  background: #a0b0b8;
+  border: none;
+  border-radius: 12px;
+  cursor: pointer;
+  padding: 0;
+  transition: background 0.2s;
+
+  &.is-on {
+    background: #1a6b7f;
+  }
+}
+
+.bw-toggle-knob {
+  position: absolute;
+  top: 3px;
+  left: 3px;
+  width: 18px;
+  height: 18px;
+  background: #fff;
+  border-radius: 50%;
+  transition: transform 0.2s;
+
+  .is-on & {
+    transform: translateX(20px);
+  }
+}
+
+/* Form area: light gray tier */
+.bw-form-area {
+  background: var(--bw-form-bg);
+  padding: 16px 24px 16px;
+}
+
+.bw-form-area-inner {
+  max-width: 1200px;
+  margin: 0 auto;
+}
+
+/* Form row: stations + dates + find button */
+.bw-form-row {
+  display: flex;
+  align-items: stretch;
+  gap: 12px;
+  margin-bottom: 12px;
+}
+
+/* Station inputs */
+.bw-stations {
+  display: flex;
+  align-items: center;
+  flex: 1.5;
+  background: var(--bw-input-bg);
+  border: none;
+  border-radius: 3px;
+  overflow: hidden;
+}
+
+.bw-station-input {
+  flex: 1;
+  border: none;
+  padding: 14px 16px;
+  font-size: 16px;
+  color: #333;
+  background: transparent;
+  outline: none;
+  min-width: 0;
+
+  &::placeholder {
+    color: #7a8a8f;
+    font-size: 16px;
+  }
+}
+
+.bw-swap-btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: none;
+  border: none;
+  padding: 8px;
+  cursor: pointer;
+  color: var(--bw-input-border);
+  flex-shrink: 0;
+
+  &:hover {
+    color: var(--bw-tab-active);
+  }
+
+  svg {
+    width: 20px;
+    height: 20px;
+  }
+}
+
+/* Date inputs */
+.bw-dates {
+  display: flex;
+  align-items: center;
+  flex: 0.8;
+  background: var(--bw-input-bg);
+  border: none;
+  border-radius: 3px;
+  overflow: hidden;
+}
+
+.bw-date-input {
+  flex: 1;
+  border: none;
+  padding: 14px 12px;
+  font-size: 15px;
+  color: #333;
+  background: transparent;
+  outline: none;
+  min-width: 0;
+
+  &::placeholder {
+    color: #7a8a8f;
+    font-size: 15px;
+  }
+
+  &:first-child {
+    border-right: 1px solid #e0e4e6;
+  }
+}
+
+/* Find Trains button */
+.bw-find-btn {
+  background: var(--bw-find-btn);
+  color: #fff;
+  border: none;
+  padding: 14px 28px;
+  font-size: 15px;
+  font-weight: 700;
+  letter-spacing: 0.8px;
+  border-radius: 4px;
+  cursor: pointer;
+  white-space: nowrap;
+  transition: background 0.15s;
+
+  &:hover {
+    background: var(--bw-find-btn-hover);
+  }
+}
+
+/* Secondary row */
+.bw-secondary {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  flex-wrap: wrap;
+}
+
+.bw-traveler-btn {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  background: none;
+  border: none;
+  color: var(--bw-text-dark);
+  font-size: 14px;
+  cursor: pointer;
+  padding: 6px 4px;
+
+  svg {
+    width: 18px;
+    height: 18px;
+  }
+
+  svg:last-child {
+    width: 12px;
+    height: 12px;
+  }
+
+  &:hover {
+    color: #1a3a5c;
+  }
+}
+
+.bw-a11y-label {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  color: var(--bw-text-dark);
+  font-size: 13px;
+  cursor: pointer;
+}
+
+.bw-a11y-check {
+  width: 16px;
+  height: 16px;
+  accent-color: var(--bw-tab-active);
+  cursor: pointer;
+  flex-shrink: 0;
+}
+
+.bw-info-btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: none;
+  border: none;
+  color: var(--bw-text-muted);
+  cursor: pointer;
+  padding: 4px;
+
+  svg {
+    width: 18px;
+    height: 18px;
+  }
+
+  &:hover {
+    color: var(--bw-text-dark);
+  }
+}
+
+.bw-action-btn {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  background: none;
+  border: none;
+  color: var(--bw-text-dark);
+  font-size: 14px;
+  cursor: pointer;
+  padding: 6px 4px;
+
+  svg {
+    width: 12px;
+    height: 12px;
+  }
+
+  &:hover {
+    color: #1a3a5c;
+  }
+
+  &.bw-advanced strong {
+    font-weight: 700;
+  }
+}
+
+/* Responsive */
+@media (width <= 900px) {
+  .bw-form-row {
+    flex-direction: column;
+  }
+
+  .bw-stations,
+  .bw-dates {
+    flex: none;
+  }
+
+  .bw-top-bar {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 10px;
+  }
+
+  .bw-secondary {
+    gap: 10px;
+  }
+
+  .bw-a11y-label {
+    font-size: 12px;
+  }
+}
