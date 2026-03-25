@@ -166,6 +166,11 @@
   --color-background: light-dark(var(--color-light), var(--color-dark));
   --color-shaded: light-dark(#f9f9f9, #111);
 
+  /* brand colors */
+  --color-amtrak-teal: #167fa6;
+  --color-amtrak-medium-blue: #003a60;
+  --color-amtrak-dark-blue: #002436;
+
   /* fonts */
   --font-family: montserrat, "Trebuchet MS", sans-serif;
 
@@ -212,7 +217,7 @@ body {
   font-family: var(--font-family);
   font-size: var(--body-font-size-m);
   line-height: var(--body-line-height);
-  padding: var(--header-height) 0 0;
+  padding: 0;
 
   &.has-breadcrumb {
     margin: calc(var(--header-height) + var(--breadcrumb-height)) 0 0;
@@ -227,8 +232,8 @@ body {
 
 header {
   display: none;
-  height: var(--header-height);
-  position: fixed;
+  position: sticky;
+  top: 0;
 }
 
 a {

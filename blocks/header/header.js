@@ -1,4 +1,4 @@
-import { getConfig, getMetadata } from '../../scripts/ak.js';
+import { getConfig, getMetadata, loadBlock } from '../../scripts/ak.js';
 import { loadFragment } from '../fragment/fragment.js';
 import { setColorScheme } from '../section-metadata/section-metadata.js';
 
@@ -11,11 +11,26 @@ const HEADER_ACTIONS = [
   '/tools/widgets/toggle',
 ];
 
+function syncPanelVisibility() {
+  const header = document.querySelector('header');
+  if (!header) return;
+  const panels = document.querySelectorAll('.mega-menu[data-nav-item]');
+  const activeItem = header.querySelector('.main-nav-item.is-open');
+  const activePanel = activeItem?.classList.contains('nav-book')
+    ? document.querySelector('.mega-menu[data-nav-item="book"]')
+    : null;
+
+  panels.forEach((p) => {
+    p.style.display = p === activePanel ? '' : 'none';
+  });
+}
+
 function closeAllMenus() {
   const openMenus = document.body.querySelectorAll('header .is-open');
   for (const openMenu of openMenus) {
     openMenu.classList.remove('is-open');
   }
+  syncPanelVisibility();
 }
 
 function docClose(e) {
@@ -31,9 +46,9 @@ function toggleMenu(menu) {
     return;
   }
 
-  // Setup the global close event
   document.addEventListener('click', docClose);
   menu.classList.add('is-open');
+  syncPanelVisibility();
 }
 
 function decorateLanguage(btn) {
@@ -125,16 +140,34 @@ function decorateMegaMenu(li) {
   return wrapper;
 }
 
-function decorateNavItem(li) {
+async function injectBookingWidget(li, headerEl) {
+  const panel = document.createElement('div');
+  panel.className = 'mega-menu';
+  panel.dataset.navItem = 'book';
+  headerEl.after(panel);
+
+  const widgetEl = document.createElement('div');
+  widgetEl.className = 'booking-widget';
+  panel.append(widgetEl);
+
+  await loadBlock(widgetEl);
+}
+
+function decorateNavItem(li, idx) {
   li.classList.add('main-nav-item');
-  const link = li.querySelector(':scope > p > a');
+  const link = li.querySelector(':scope > p > a') || li.querySelector(':scope > p');
   if (link) link.classList.add('main-nav-link');
   const menu = decorateMegaMenu(li) || decorateMenu(li);
-  if (!(menu || link)) return;
+
+  const isBookItem = idx === 0;
+  if (isBookItem) li.classList.add('nav-book');
+
+  if (!link) return;
   link.addEventListener('click', (e) => {
     e.preventDefault();
     toggleMenu(li);
   });
+  link.style.cursor = 'pointer';
 }
 
 function decorateBrandSection(section) {
@@ -147,7 +180,7 @@ function decorateBrandSection(section) {
   brandLink.append(span);
 }
 
-function decorateNavSection(section) {
+async function decorateNavSection(section, headerEl) {
   section.classList.add('main-nav-section');
   const navContent = section.querySelector('.default-content');
   const navList = section.querySelector('ul');
@@ -159,8 +192,14 @@ function decorateNavSection(section) {
   navContent.append(nav);
 
   const mainNavItems = section.querySelectorAll('nav > ul > li');
-  for (const navItem of mainNavItems) {
-    decorateNavItem(navItem);
+  for (const [idx, navItem] of [...mainNavItems].entries()) {
+    decorateNavItem(navItem, idx);
+  }
+
+  const bookItem = section.querySelector('.nav-book');
+  if (bookItem) {
+    await injectBookingWidget(bookItem, headerEl);
+    bookItem.classList.add('is-open');
   }
 }
 
@@ -168,10 +207,10 @@ async function decorateActionSection(section) {
   section.classList.add('actions-section');
 }
 
-async function decorateHeader(fragment) {
+async function decorateHeader(fragment, headerEl) {
   const sections = fragment.querySelectorAll(':scope > .section');
   if (sections[0]) decorateBrandSection(sections[0]);
-  if (sections[1]) decorateNavSection(sections[1]);
+  if (sections[1]) await decorateNavSection(sections[1], headerEl);
   if (sections[2]) decorateActionSection(sections[2]);
 
   for (const pattern of HEADER_ACTIONS) {
@@ -189,8 +228,8 @@ export default async function init(el) {
   try {
     const fragment = await loadFragment(`${locale.prefix}${path}`);
     fragment.classList.add('header-content');
-    await decorateHeader(fragment);
     el.append(fragment);
+    await decorateHeader(fragment, el);
   } catch (e) {
     throw Error(e);
   }
