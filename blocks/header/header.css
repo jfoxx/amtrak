@@ -240,12 +240,12 @@ header {
       letter-spacing: 1px;
 
       &:hover {
-        border-bottom-color: rgba(26 58 92 / 30%);
+        border-bottom-color: var(--color-amtrak-teal);
       }
     }
 
     .main-nav-item.is-open .main-nav-link {
-      border-bottom-color: var(--header-nav-text);
+      border-bottom-color: var(--color-amtrak-teal);
     }
 
     .menu {

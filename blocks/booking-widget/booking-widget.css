@@ -166,7 +166,8 @@
 /* Form area: light gray tier */
 .bw-form-area {
   background: var(--bw-form-bg);
-  padding: 16px 24px 16px;
+  padding: 26px 24px 6px;
+  min-height: 203px;
 }
 
 .bw-form-area-inner {

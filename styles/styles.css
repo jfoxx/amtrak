@@ -154,7 +154,7 @@
   --body-line-height: 1.6;
 
   /* misc */
-  --header-height: 64px;
+  --header-height: 54px;
   --breadcrumb-height: 24px;
 }
 
@@ -293,6 +293,7 @@ h5,
 h6 {
   font-weight: 300;
   line-height: var(--heading-line-height);
+  color: var(--color-amtrak-medium-blue);
 }
 
 h1 { font-size: var(--heading-font-size-xxl); }

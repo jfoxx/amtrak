@@ -14,11 +14,13 @@
 
 .tab-list {
   display: flex;
-  justify-content: center;
+  justify-content: start;
   list-style: none;
   gap: 12px;
-  margin: 0;
+  margin: 20px 0 0;
   padding: 0;
+  max-width: var(--section-container-width);
+  margin-inline: auto;
 
   button {
     background-color: transparent;
@@ -29,9 +31,10 @@
     border-bottom: 2px solid transparent;
     box-sizing: border-box;
     transition: border-bottom 0.2s ease-in-out;
+    color: var(--color-amtrak-dark-blue);
 
     &.is-active {
-      border-bottom: 2px solid light-dark(#000, #fff);
+      border-bottom: 2px solid var(--color-amtrak-teal);
     }
   }
 }
