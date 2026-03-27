@@ -92,6 +92,11 @@ async function handleLayout(text, section, type) {
   section.classList.add(`${type}-${text}`);
 }
 
+async function handleColumns(text, section) {
+  const columns = `col-${text}`;
+  section.classList.add(columns);
+}
+
 const getMetadata = (el) => [...el.childNodes].reduce((rdx, row) => {
   if (row.children) {
     const key = row.children[0].textContent.trim().toLowerCase();
@@ -112,6 +117,7 @@ export default async function init(el) {
   if (metadata.spacing?.text) handleLayout(metadata.spacing.text, section, 'spacing');
   if (metadata.container?.text) handleLayout(metadata.container.text, section, 'container');
   if (metadata.layout?.text) handleLayout(metadata.layout.text, section, 'layout');
+  if (metadata.columns?.text) handleColumns(metadata.columns.text, section, 'columns');
   if (metadata['background-color']?.content) handleBackground(metadata['background-color'].content, section);
   if (metadata['background-image']?.content) handleBackground(metadata['background-image'].content, section);
   if (metadata.background?.content) handleBackground(metadata.background, section);
