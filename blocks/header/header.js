@@ -144,7 +144,7 @@ async function injectBookingWidget(li, headerEl) {
   const panel = document.createElement('div');
   panel.className = 'mega-menu';
   panel.dataset.navItem = 'book';
-  headerEl.after(panel);
+  headerEl.insertAdjacentElement('afterend', panel);
 
   const widgetEl = document.createElement('div');
   widgetEl.className = 'booking-widget';
@@ -159,8 +159,11 @@ function decorateNavItem(li, idx) {
   if (link) link.classList.add('main-nav-link');
   const menu = decorateMegaMenu(li) || decorateMenu(li);
 
-  const isBookItem = idx === 0;
-  if (isBookItem) li.classList.add('nav-book');
+  if (getMetadata('navbooking')) {
+    const isBookItem = idx === 0;
+    if (isBookItem) li.classList.add('nav-book');
+  }
+
 
   if (!link) return;
   link.addEventListener('click', (e) => {

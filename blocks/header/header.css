@@ -273,6 +273,9 @@ header {
 }
 
 .mega-menu[data-nav-item] {
+  position: absolute;
+  top: var(--header-height);
+  left: 0;
   width: 100%;
 }
 
@@ -317,6 +320,10 @@ header {
 
     .brand-section .action-wrapper.more {
       display: none;
+    }
+
+    .booking-widget {
+      min-height: 282px;
     }
   }
 }

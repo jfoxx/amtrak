@@ -1,4 +1,4 @@
-import { loadArea, setConfig } from './ak.js';
+import { loadArea, setConfig, getMetadata } from './ak.js';
 
 const hostnames = ['authorkit.dev'];
 
@@ -32,6 +32,8 @@ const decorateArea = ({ area = document }) => {
 
   eagerLoad(area, 'img');
 };
+
+if (getMetadata('navbooking')) document.body.classList.add('navbooking');
 
 export async function loadPage() {
   setConfig({ hostnames, locales, linkBlocks, components, decorateArea });
