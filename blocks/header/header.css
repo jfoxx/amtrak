@@ -38,10 +38,8 @@ header {
 
   .header-content {
     display: grid;
-    grid-template-areas:
-      "brand nav actions";
-    grid-template-columns: auto 1fr auto;
-    grid-template-rows: var(--header-height);
+    grid-template:
+      "brand nav actions" var(--header-height) / auto 1fr auto;
     align-items: stretch;
     max-width: 1200px;
     margin: 0 auto;
@@ -282,11 +280,8 @@ header {
 @media (width <= 900px) {
   header {
     .header-content {
-      grid-template-areas:
-        "brand actions"
-        "nav nav";
-      grid-template-columns: 1fr auto;
-      grid-template-rows: var(--header-height) auto;
+      grid-template:
+        "brand actions" var(--header-height) "nav nav" auto / 1fr auto;
     }
 
     .main-nav-section {

@@ -157,13 +157,12 @@ function decorateNavItem(li, idx) {
   li.classList.add('main-nav-item');
   const link = li.querySelector(':scope > p > a') || li.querySelector(':scope > p');
   if (link) link.classList.add('main-nav-link');
-  const menu = decorateMegaMenu(li) || decorateMenu(li);
+  if (!decorateMegaMenu(li)) decorateMenu(li);
 
   if (getMetadata('navbooking')) {
     const isBookItem = idx === 0;
     if (isBookItem) li.classList.add('nav-book');
   }
-
 
   if (!link) return;
   link.addEventListener('click', (e) => {

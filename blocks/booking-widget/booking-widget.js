@@ -114,6 +114,12 @@ function buildStationInputs() {
   fromInput.className = 'bw-station-input';
   fromInput.setAttribute('aria-label', 'From station');
 
+  const toInput = document.createElement('input');
+  toInput.type = 'text';
+  toInput.placeholder = 'To';
+  toInput.className = 'bw-station-input';
+  toInput.setAttribute('aria-label', 'To station');
+
   const swapBtn = document.createElement('button');
   swapBtn.className = 'bw-swap-btn';
   swapBtn.setAttribute('aria-label', 'Switch departure and arrival stations');
@@ -123,12 +129,6 @@ function buildStationInputs() {
     fromInput.value = toInput.value;
     toInput.value = temp;
   });
-
-  const toInput = document.createElement('input');
-  toInput.type = 'text';
-  toInput.placeholder = 'To';
-  toInput.className = 'bw-station-input';
-  toInput.setAttribute('aria-label', 'To station');
 
   wrapper.append(fromInput, swapBtn, toInput);
   return wrapper;

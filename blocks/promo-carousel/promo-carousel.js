@@ -23,7 +23,8 @@ async function fetchPromo(path) {
   let text = '';
   for (const el of walk) {
     const t = el.textContent.trim();
-    if (t && !el.querySelector('img, picture')) { text = t; break; }
+    if (t && !el.querySelector('img, picture')) { text = t; }
+    if (text) break;
   }
 
   return { picture, text, link };
