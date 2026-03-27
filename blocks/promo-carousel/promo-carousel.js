@@ -18,20 +18,22 @@ async function fetchPromo(path) {
   replaceDotMedia(fetchPath, doc);
 
   const picture = doc.querySelector('picture');
+  const link = doc.querySelector('a').getAttribute('href');
   const walk = doc.querySelectorAll('div > div:last-child, p, strong, a, h1, h2, h3');
   let text = '';
   for (const el of walk) {
     const t = el.textContent.trim();
-    if (t && !el.querySelector('img, picture')) { text = t; break; }
+    if (t && !el.querySelector('img, picture')) { text = t; }
+    if (text) break;
   }
 
-  return { picture, text, path };
+  return { picture, text, link };
 }
 
 function buildCard(promo) {
   const card = document.createElement('a');
   card.className = 'pc-card';
-  card.href = promo.path;
+  card.href = promo.link;
 
   if (promo.picture) {
     const imgWrap = document.createElement('div');
