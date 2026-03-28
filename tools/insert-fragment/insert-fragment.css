@@ -11,7 +11,7 @@ body {
   flex-direction: column;
 }
 
-html.sl-loaded body {
+body.is-ready {
   display: flex;
 }
 
@@ -25,17 +25,6 @@ header {
   flex-shrink: 0;
 }
 
-header sl-button.back {
-  background: none;
-  border: none;
-  cursor: pointer;
-  padding: 2px 6px;
-  font-size: 16px;
-  color: #444;
-  line-height: 1;
-}
-
-header sl-button.back:hover { color: #000; }
 header sl-button.back[disabled] { opacity: 0; pointer-events: none; }
 
 .breadcrumb {
@@ -94,33 +83,4 @@ footer {
   gap: 8px;
 }
 
-footer sl-button {
-  flex: 1;
-  padding: 8px 6px;
-  border: none;
-  border-radius: 4px;
-  font-size: 12px;
-  cursor: pointer;
-  font-weight: 500;
-}
-
-footer sl-button[disabled] {
-  background: #e0e0e0;
-  color: #aaa;
-  cursor: not-allowed;
-}
-
-#btn-reference {
-  background: #fff;
-  color: #1473e6;
-  border: 1px solid #1473e6;
-}
-
-#btn-reference:not([disabled]):hover { background: #f0f6ff; }
-
-#btn-copy {
-  background: #1473e6;
-  color: #fff;
-}
-
-#btn-copy:not([disabled]):hover { background: #0d66d0; }
+footer sl-button { flex: 1; }

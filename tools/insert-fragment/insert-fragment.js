@@ -119,6 +119,7 @@ window.addEventListener('message', (e) => {
   if (!e.data?.token || !e.data?.context) return;
   daToken = e.data.token;
   daContext = e.data.context;
+  document.body.classList.add('is-ready');
   init();
 });
 
