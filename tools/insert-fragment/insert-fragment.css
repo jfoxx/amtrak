@@ -25,7 +25,17 @@ header {
   flex-shrink: 0;
 }
 
-header sl-button.back[disabled] { opacity: 0; pointer-events: none; }
+header button.back {
+  background: none;
+  border: none;
+  padding: 2px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  flex-shrink: 0;
+}
+
+header button.back[disabled] { opacity: 0; pointer-events: none; }
 
 .breadcrumb {
   flex: 1;
@@ -55,7 +65,7 @@ header sl-button.back[disabled] { opacity: 0; pointer-events: none; }
 .list-item:hover { background: #f0f6ff; }
 .list-item.is-selected { background: #ddeeff; }
 
-.list-item .icon { font-size: 15px; flex-shrink: 0; }
+.list-item .icon { width: 18px; height: 18px; flex-shrink: 0; }
 
 .list-item .name {
   flex: 1;

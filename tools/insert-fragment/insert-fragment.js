@@ -47,10 +47,10 @@ function renderList(items, onNavigate) {
     const isFolder = !item.ext;
     const el = document.createElement('div');
     el.className = `list-item ${isFolder ? 'folder' : 'page'}`;
+    const icon = isFolder ? 'icons/Smock_Folder_18_N.svg' : 'icons/Smock_FileHTML_18_N.svg';
     el.innerHTML = `
-      <span class="icon">${isFolder ? '📁' : '📄'}</span>
+      <img class="icon" src="${icon}" alt="">
       <span class="name">${item.name}</span>
-      ${isFolder ? '<span>›</span>' : ''}
     `;
 
     const itemPath = item.path || `${currentPath}/${item.name}`;
