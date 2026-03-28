@@ -111,10 +111,12 @@ async function init() {
 }
 
 async function fetchFragmentContent(path) {
-  const { org, repo, ref } = daContext;
-  const previewOrigin = `https://${ref || 'main'}--${repo}--${org}.aem.page`;
-  const resp = await fetch(`${previewOrigin}${path}.plain.html`);
-  if (!resp.ok) throw new Error(`${resp.status} fetching preview`);
+  const { org, repo } = daContext;
+  const url = `https://admin.da.live/source/${org}/${repo}${path}`;
+  const resp = await fetch(url, {
+    headers: { Authorization: `Bearer ${daToken}` },
+  });
+  if (!resp.ok) throw new Error(`${resp.status} fetching source`);
   const html = await resp.text();
   const doc = new DOMParser().parseFromString(html, 'text/html');
   return doc.body.innerHTML;
