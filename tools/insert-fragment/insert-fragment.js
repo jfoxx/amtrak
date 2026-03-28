@@ -114,21 +114,45 @@ async function init() {
   navigate(basePath, false);
 }
 
-async function fetchFragmentContent(path) {
-  const { org, repo } = daContext;
-  const url = `https://admin.da.live/source/${org}/${repo}${path}`;
-  const resp = await fetch(url, {
-    headers: { Authorization: `Bearer ${daToken}` },
+function blockToTable(block) {
+  const classes = block.className.split(' ');
+  const name = classes.shift();
+  const label = classes.length ? `${name} (${classes.join(', ')})` : name;
+  const rows = [...block.children];
+  const maxCols = rows.reduce((cols, row) => Math.max(cols, row.children.length), 0) || 1;
+  const table = document.createElement('table');
+  table.setAttribute('border', '1');
+  const headerRow = document.createElement('tr');
+  const th = document.createElement('td');
+  th.setAttribute('colspan', String(maxCols));
+  th.textContent = label;
+  headerRow.append(th);
+  table.append(headerRow);
+  rows.forEach((row) => {
+    const tr = document.createElement('tr');
+    [...row.children].forEach((col) => {
+      const td = document.createElement('td');
+      td.innerHTML = col.innerHTML;
+      tr.append(td);
+    });
+    table.append(tr);
   });
-  if (!resp.ok) throw new Error(`${resp.status} fetching source`);
+  return table;
+}
+
+async function fetchFragmentContent(path) {
+  const { org, repo, ref = 'main' } = daContext;
+  const url = `https://${ref}--${repo}--${org}.aem.page${path}.plain.html`;
+  const resp = await fetch(url);
+  if (!resp.ok) throw new Error(`${resp.status} fetching preview`);
   const html = await resp.text();
   const doc = new DOMParser().parseFromString(html, 'text/html');
-  const main = doc.querySelector('main');
-  if (!main) return doc.body.innerHTML;
-  // Strip section <div> wrappers so block <table> elements are top-level
-  // when ProseMirror parses dom.body, matching DA's block parseRules
-  const sections = [...main.querySelectorAll(':scope > div')];
-  return sections.flatMap((s) => [...s.children]).map((el) => el.outerHTML).join('\n');
+  const sections = [...doc.querySelectorAll('body > div, main > div')];
+  const parts = sections.flatMap((section) => [...section.children].map((child) => {
+    if (child.nodeName === 'DIV') return blockToTable(child).outerHTML;
+    return child.outerHTML;
+  }));
+  return parts.join('\n');
 }
 
 // DA SDK is a Promise that resolves with context, token, and actions
