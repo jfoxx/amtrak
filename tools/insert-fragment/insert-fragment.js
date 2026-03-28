@@ -78,8 +78,9 @@ async function navigate(path, push = true) {
       headers: { Authorization: `Bearer ${daToken}` },
     });
     if (!resp.ok) throw new Error(`${resp.status}`);
-    const { data } = await resp.json();
-    renderList(data || [], navigate);
+    const json = await resp.json();
+    const items = Array.isArray(json) ? json : (json.data ?? json.items ?? []);
+    renderList(items, navigate);
   } catch (err) {
     showStatus(`Error loading ${path}: ${err.message}`, true);
   }
