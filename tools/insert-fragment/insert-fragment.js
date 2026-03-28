@@ -1,3 +1,6 @@
+// eslint-disable-next-line import/no-unresolved
+await import('https://da.live/nx/utils/sdk.js');
+
 let daContext;
 let daToken;
 let daActions;
