@@ -123,7 +123,8 @@ async function fetchFragmentContent(path) {
   if (!resp.ok) throw new Error(`${resp.status} fetching source`);
   const html = await resp.text();
   const doc = new DOMParser().parseFromString(html, 'text/html');
-  return doc.body.innerHTML;
+  const main = doc.querySelector('main');
+  return main ? main.innerHTML : doc.body.innerHTML;
 }
 
 // DA SDK is a Promise that resolves with context, token, and actions
