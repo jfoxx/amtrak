@@ -113,9 +113,11 @@ async function loadConfig() {
     });
     if (resp.ok) {
       const json = await resp.json();
-      if (json.basePath) basePath = json.basePath;
-      if (json.excludedPaths) {
-        excludedPaths = json.excludedPaths.split(',').map((p) => p.trim()).filter(Boolean);
+      const rows = Array.isArray(json) ? json : (json.data ?? []);
+      const config = Object.fromEntries(rows.map(({ key, value }) => [key, value]));
+      if (config.basePath) basePath = config.basePath;
+      if (config.excludedPaths) {
+        excludedPaths = config.excludedPaths.split(',').map((p) => p.trim()).filter(Boolean);
       }
     }
   } catch { /* use default /fragments */ }
