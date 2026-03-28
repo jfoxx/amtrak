@@ -1,9 +1,11 @@
 let daOrigin = '*';
-let org, repo, branch;
+let org;
+let repo;
+let branch;
 let basePath = '/fragments';
 let currentPath = '';
 let selectedItem = null;
-let pathStack = [];
+const pathStack = [];
 
 const listEl = document.getElementById('list');
 const breadcrumbEl = document.getElementById('breadcrumb');
@@ -11,66 +13,44 @@ const backBtn = document.getElementById('btn-back');
 const referenceBtn = document.getElementById('btn-reference');
 const copyBtn = document.getElementById('btn-copy');
 
-// --- DA context handshake ---
-window.addEventListener('message', (e) => {
-  let data;
-  try { data = typeof e.data === 'string' ? JSON.parse(e.data) : e.data; } catch { return; }
-
-  if (data.action === 'da:context') {
-    ({ org, repo, branch } = data);
-    daOrigin = e.origin || '*';
-    init();
-  }
-});
-
-parent.postMessage(JSON.stringify({ action: 'da:requestContext' }), '*');
-
-// Fallback for direct/test loading via query params
-setTimeout(() => {
-  if (!org) {
-    const params = new URLSearchParams(window.location.search);
-    org = params.get('org');
-    repo = params.get('repo');
-    branch = params.get('branch') || 'main';
-    if (org && repo) init();
-    else showStatus('Waiting for DA context…');
-  }
-}, 300);
-
-async function init() {
-  await loadConfig();
-  currentPath = basePath;
-  breadcrumbEl.textContent = basePath;
-  loadList(currentPath);
+function showStatus(msg, isError = false) {
+  listEl.innerHTML = `<p class="status ${isError ? 'error' : ''}">${msg}</p>`;
 }
 
-async function loadConfig() {
-  try {
-    const url = `https://admin.da.live/source/${org}/${repo}/.da/insert-fragment.json`;
-    const resp = await fetch(url, { credentials: 'include' });
-    if (resp.ok) {
-      const json = await resp.json();
-      if (json.basePath) basePath = json.basePath;
-    }
-  } catch { /* use default /fragments */ }
+function clearSelection() {
+  selectedItem = null;
+  referenceBtn.disabled = true;
+  copyBtn.disabled = true;
 }
 
-async function loadList(path) {
-  showStatus('Loading…');
-  try {
-    const url = `https://admin.da.live/list/${org}/${repo}${path}`;
-    const resp = await fetch(url, { credentials: 'include' });
-    if (!resp.ok) throw new Error(`${resp.status}`);
-    const { data } = await resp.json();
-    renderList(data || []);
-  } catch (err) {
-    showStatus(`Error loading ${path}: ${err.message}`, true);
-  }
+function sendInsert(html) {
+  parent.postMessage(JSON.stringify({ action: 'da:insert', html }), daOrigin);
 }
 
-function renderList(items) {
+async function fetchFragmentContent(path) {
+  const previewOrigin = `https://${branch || 'main'}--${repo}--${org}.aem.page`;
+  const resp = await fetch(`${previewOrigin}${path}.plain.html`);
+  if (!resp.ok) throw new Error(`${resp.status} fetching preview`);
+  const html = await resp.text();
+  const doc = new DOMParser().parseFromString(html, 'text/html');
+  return doc.body.innerHTML;
+}
+
+function selectPage(item, el) {
+  listEl.querySelectorAll('.list-item').forEach((i) => i.classList.remove('is-selected'));
+  el.classList.add('is-selected');
+  selectedItem = { ...item, path: item.path || `${currentPath}/${item.name}` };
+  referenceBtn.disabled = false;
+  copyBtn.disabled = false;
+}
+
+// onNavigate passed as arg to avoid circular reference with navigate()
+function renderList(items, onNavigate) {
   listEl.innerHTML = '';
-  if (!items.length) { showStatus('No items found.'); return; }
+  if (!items.length) {
+    showStatus('No items found.');
+    return;
+  }
 
   const sorted = [...items].sort((a, b) => {
     if (!a.ext && b.ext) return -1;
@@ -88,8 +68,9 @@ function renderList(items) {
       ${isFolder ? '<span>›</span>' : ''}
     `;
 
+    const itemPath = item.path || `${currentPath}/${item.name}`;
     if (isFolder) {
-      el.addEventListener('click', () => navigateTo(item.path || `${currentPath}/${item.name}`));
+      el.addEventListener('click', () => onNavigate(itemPath));
     } else {
       el.addEventListener('click', () => selectPage(item, el));
     }
@@ -98,37 +79,76 @@ function renderList(items) {
   }
 }
 
-function navigateTo(path) {
-  pathStack.push(currentPath);
+async function navigate(path, push = true) {
+  if (push) pathStack.push(currentPath);
   currentPath = path;
   breadcrumbEl.textContent = path;
-  backBtn.disabled = false;
+  backBtn.disabled = pathStack.length === 0;
   clearSelection();
-  loadList(path);
+  showStatus('Loading…');
+  try {
+    const url = `https://admin.da.live/list/${org}/${repo}${path}`;
+    const resp = await fetch(url, { credentials: 'include' });
+    if (!resp.ok) throw new Error(`${resp.status}`);
+    const { data } = await resp.json();
+    renderList(data || [], navigate);
+  } catch (err) {
+    showStatus(`Error loading ${path}: ${err.message}`, true);
+  }
 }
+
+async function loadConfig() {
+  try {
+    const url = `https://admin.da.live/source/${org}/${repo}/.da/insert-fragment.json`;
+    const resp = await fetch(url, { credentials: 'include' });
+    if (resp.ok) {
+      const json = await resp.json();
+      if (json.basePath) basePath = json.basePath;
+    }
+  } catch { /* use default /fragments */ }
+}
+
+async function init() {
+  await loadConfig();
+  navigate(basePath, false);
+}
+
+// --- DA context handshake ---
+window.addEventListener('message', (e) => {
+  let data;
+  try {
+    data = typeof e.data === 'string' ? JSON.parse(e.data) : e.data;
+  } catch { return; }
+
+  if (data.action === 'da:context') {
+    ({ org, repo, branch } = data);
+    daOrigin = e.origin || '*';
+    init();
+  }
+});
+
+parent.postMessage(JSON.stringify({ action: 'da:requestContext' }), '*');
+
+// Fallback for direct/test loading via query params
+setTimeout(() => {
+  if (!org) {
+    const params = new URLSearchParams(window.location.search);
+    org = params.get('org');
+    repo = params.get('repo');
+    branch = params.get('branch') || 'main';
+    if (org && repo) {
+      init();
+    } else {
+      showStatus('Waiting for DA context…');
+    }
+  }
+}, 300);
 
 backBtn.addEventListener('click', () => {
   if (!pathStack.length) return;
-  currentPath = pathStack.pop();
-  breadcrumbEl.textContent = currentPath;
-  backBtn.disabled = pathStack.length === 0;
-  clearSelection();
-  loadList(currentPath);
+  const path = pathStack.pop();
+  navigate(path, false);
 });
-
-function selectPage(item, el) {
-  listEl.querySelectorAll('.list-item').forEach((i) => i.classList.remove('is-selected'));
-  el.classList.add('is-selected');
-  selectedItem = { ...item, path: item.path || `${currentPath}/${item.name}` };
-  referenceBtn.disabled = false;
-  copyBtn.disabled = false;
-}
-
-function clearSelection() {
-  selectedItem = null;
-  referenceBtn.disabled = true;
-  copyBtn.disabled = true;
-}
 
 referenceBtn.addEventListener('click', () => {
   if (!selectedItem) return;
@@ -155,20 +175,3 @@ copyBtn.addEventListener('click', async () => {
     copyBtn.textContent = 'Copy contents';
   }
 });
-
-function sendInsert(html) {
-  parent.postMessage(JSON.stringify({ action: 'da:insert', html }), daOrigin);
-}
-
-async function fetchFragmentContent(path) {
-  const previewOrigin = `https://${branch || 'main'}--${repo}--${org}.aem.page`;
-  const resp = await fetch(`${previewOrigin}${path}.plain.html`);
-  if (!resp.ok) throw new Error(`${resp.status} fetching preview`);
-  const html = await resp.text();
-  const doc = new DOMParser().parseFromString(html, 'text/html');
-  return doc.body.innerHTML;
-}
-
-function showStatus(msg, isError = false) {
-  listEl.innerHTML = `<p class="status ${isError ? 'error' : ''}">${msg}</p>`;
-}
