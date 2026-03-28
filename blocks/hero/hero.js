@@ -31,7 +31,7 @@ function decorateBackground(bg) {
   vidLink.remove();
 }
 
-function decorateForeground(fg) {
+function decorateForeground(fg, el) {
   const { children } = fg;
   for (const [idx, child] of [...children].entries()) {
     const heading = child.querySelector('h1, h2, h3, h4, h5, h6');
@@ -46,11 +46,7 @@ function decorateForeground(fg) {
     // Determine foreground column types
     if (text) {
       child.classList.add('fg-text');
-      if (idx === 0) {
-        child.closest('.hero').classList.add('hero-text-start');
-      } else {
-        child.closest('.hero').classList.add('hero-text-end');
-      }
+      el.classList.add(idx === 0 ? 'hero-text-start' : 'hero-text-end');
     }
   }
 }
@@ -59,7 +55,7 @@ export default async function init(el) {
   const rows = [...el.querySelectorAll(':scope > div')];
   const fg = rows.pop();
   fg.classList.add('hero-foreground');
-  decorateForeground(fg);
+  decorateForeground(fg, el);
   if (rows.length) {
     const bg = rows.pop();
     bg.classList.add('hero-background');
