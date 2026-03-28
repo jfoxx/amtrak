@@ -66,6 +66,8 @@ header button.back[disabled] { opacity: 0; pointer-events: none; }
   cursor: pointer;
   border-bottom: 1px solid #f0f0f0;
   user-select: none;
+  font-size: 14px;
+  font-weight: 400;
 }
 
 .list-item:hover { background: #f0f6ff; }
@@ -80,7 +82,6 @@ header button.back[disabled] { opacity: 0; pointer-events: none; }
   white-space: nowrap;
 }
 
-.list-item.folder .name { font-weight: 500; }
 
 .status {
   padding: 12px 14px;
