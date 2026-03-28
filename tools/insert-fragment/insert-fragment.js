@@ -35,7 +35,8 @@ function selectPage(item, el) {
 }
 
 function isExcluded(itemPath) {
-  return excludedPaths.some((pattern) => itemPath === pattern || itemPath.startsWith(`${pattern}/`));
+  const cleanPath = itemPath.replace(/\.html$/, '');
+  return excludedPaths.some((pattern) => cleanPath === pattern || cleanPath.startsWith(`${pattern}/`));
 }
 
 // onNavigate passed as arg to avoid circular reference with navigate()
