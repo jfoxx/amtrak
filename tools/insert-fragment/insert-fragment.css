@@ -35,6 +35,12 @@ header button.back {
   flex-shrink: 0;
 }
 
+header button.back img {
+  width: 18px;
+  height: 18px;
+  display: block;
+}
+
 header button.back[disabled] { opacity: 0; pointer-events: none; }
 
 .breadcrumb {
