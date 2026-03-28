@@ -5,6 +5,7 @@ let daContext;
 let daToken;
 let daActions;
 let basePath = '/fragments';
+let excludedPaths = [];
 let currentPath = '';
 let selectedItem = null;
 const pathStack = [];
@@ -33,15 +34,23 @@ function selectPage(item, el) {
   insertBtn.toggleAttribute('disabled', false);
 }
 
+function isExcluded(itemPath) {
+  return excludedPaths.some((pattern) => itemPath === pattern || itemPath.startsWith(`${pattern}/`));
+}
+
 // onNavigate passed as arg to avoid circular reference with navigate()
 function renderList(items, onNavigate) {
   listEl.innerHTML = '';
-  if (!items.length) {
+  const visible = items.filter((item) => {
+    const itemPath = item.path || `${currentPath}/${item.name}`;
+    return !isExcluded(itemPath);
+  });
+  if (!visible.length) {
     showStatus('No items found.');
     return;
   }
 
-  const sorted = [...items].sort((a, b) => {
+  const sorted = [...visible].sort((a, b) => {
     if (!a.ext && b.ext) return -1;
     if (a.ext && !b.ext) return 1;
     return a.name.localeCompare(b.name);
@@ -105,6 +114,9 @@ async function loadConfig() {
     if (resp.ok) {
       const json = await resp.json();
       if (json.basePath) basePath = json.basePath;
+      if (json.excludedPaths) {
+        excludedPaths = json.excludedPaths.split(',').map((p) => p.trim()).filter(Boolean);
+      }
     }
   } catch { /* use default /fragments */ }
 }
