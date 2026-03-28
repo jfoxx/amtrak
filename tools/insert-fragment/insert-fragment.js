@@ -176,8 +176,10 @@ backBtn.addEventListener('click', () => {
 
 referenceBtn.addEventListener('click', () => {
   if (!selectedItem) return;
-  const { path } = selectedItem;
-  const html = `<table><tbody><tr><td>fragment</td></tr><tr><td><a href="${path}">${path}</a></td></tr></tbody></table>`;
+  const { org, repo, ref = 'main' } = daContext;
+  const cleanPath = selectedItem.path.replace(/\.html$/, '');
+  const href = `https://${ref}--${repo}--${org}.aem.page${cleanPath}`;
+  const html = `<table><tbody><tr><td>fragment</td></tr><tr><td><a href="${href}">${href}</a></td></tr></tbody></table>`;
   daActions.sendHTML(html);
 });
 
