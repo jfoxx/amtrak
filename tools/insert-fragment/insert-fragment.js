@@ -1,5 +1,5 @@
 // eslint-disable-next-line import/no-unresolved
-await import('https://da.live/nx/utils/sdk.js');
+import DA_SDK from 'https://da.live/nx/utils/sdk.js';
 
 let daContext;
 let daToken;
@@ -126,8 +126,8 @@ async function fetchFragmentContent(path) {
   return doc.body.innerHTML;
 }
 
-// DA SDK provides context, token, and actions
-window.DA_SDK.ready().then(({ context, token, actions }) => {
+// DA SDK is a Promise that resolves with context, token, and actions
+DA_SDK.then(({ context, token, actions }) => {
   daContext = context;
   daToken = token;
   daActions = actions;
