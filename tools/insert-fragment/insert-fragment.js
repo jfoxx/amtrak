@@ -124,7 +124,11 @@ async function fetchFragmentContent(path) {
   const html = await resp.text();
   const doc = new DOMParser().parseFromString(html, 'text/html');
   const main = doc.querySelector('main');
-  return main ? main.innerHTML : doc.body.innerHTML;
+  if (!main) return doc.body.innerHTML;
+  // Strip section <div> wrappers so block <table> elements are top-level
+  // when ProseMirror parses dom.body, matching DA's block parseRules
+  const sections = [...main.querySelectorAll(':scope > div')];
+  return sections.flatMap((s) => [...s.children]).map((el) => el.outerHTML).join('\n');
 }
 
 // DA SDK is a Promise that resolves with context, token, and actions
