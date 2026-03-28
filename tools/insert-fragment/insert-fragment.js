@@ -79,7 +79,12 @@ async function navigate(path, push = true) {
     });
     if (!resp.ok) throw new Error(`${resp.status}`);
     const json = await resp.json();
-    const items = Array.isArray(json) ? json : (json.data ?? json.items ?? []);
+    const raw = Array.isArray(json) ? json : (json.data ?? json.items ?? []);
+    const prefix = `/${org}/${repo}`;
+    const items = raw.map((item) => ({
+      ...item,
+      path: item.path?.startsWith(prefix) ? item.path.slice(prefix.length) : item.path,
+    }));
     renderList(items, navigate);
   } catch (err) {
     showStatus(`Error loading ${path}: ${err.message}`, true);
