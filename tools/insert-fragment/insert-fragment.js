@@ -1,5 +1,6 @@
 let daContext;
 let daToken;
+let daActions;
 let basePath = '/fragments';
 let currentPath = '';
 let selectedItem = null;
@@ -9,7 +10,7 @@ const listEl = document.getElementById('list');
 const breadcrumbEl = document.getElementById('breadcrumb');
 const backBtn = document.getElementById('btn-back');
 const referenceBtn = document.getElementById('btn-reference');
-const copyBtn = document.getElementById('btn-copy');
+const insertBtn = document.getElementById('btn-copy');
 
 function showStatus(msg, isError = false) {
   listEl.innerHTML = `<p class="status ${isError ? 'error' : ''}">${msg}</p>`;
@@ -18,7 +19,7 @@ function showStatus(msg, isError = false) {
 function clearSelection() {
   selectedItem = null;
   referenceBtn.toggleAttribute('disabled', true);
-  copyBtn.toggleAttribute('disabled', true);
+  insertBtn.toggleAttribute('disabled', true);
 }
 
 function selectPage(item, el) {
@@ -26,7 +27,7 @@ function selectPage(item, el) {
   el.classList.add('is-selected');
   selectedItem = { ...item, path: item.path || `${currentPath}/${item.name}` };
   referenceBtn.toggleAttribute('disabled', false);
-  copyBtn.toggleAttribute('disabled', false);
+  insertBtn.toggleAttribute('disabled', false);
 }
 
 // onNavigate passed as arg to avoid circular reference with navigate()
@@ -122,11 +123,11 @@ async function fetchFragmentContent(path) {
   return doc.body.innerHTML;
 }
 
-// DA sends { token, context } via postMessage
-window.addEventListener('message', (e) => {
-  if (!e.data?.token || !e.data?.context) return;
-  daToken = e.data.token;
-  daContext = e.data.context;
+// DA SDK provides context, token, and actions
+window.DA_SDK.ready().then(({ context, token, actions }) => {
+  daContext = context;
+  daToken = token;
+  daActions = actions;
   document.body.classList.add('is-ready');
   init();
 });
@@ -141,24 +142,24 @@ referenceBtn.addEventListener('click', () => {
   if (!selectedItem) return;
   const { path } = selectedItem;
   const html = `<table><tbody><tr><td>fragment</td></tr><tr><td><a href="${path}">${path}</a></td></tr></tbody></table>`;
-  window.parent.postMessage(html);
+  daActions.sendHTML(html);
 });
 
-copyBtn.addEventListener('click', async () => {
+insertBtn.addEventListener('click', async () => {
   if (!selectedItem) return;
-  copyBtn.toggleAttribute('disabled', true);
-  copyBtn.textContent = 'Fetching…';
+  insertBtn.toggleAttribute('disabled', true);
+  insertBtn.textContent = 'Fetching…';
   try {
     const html = await fetchFragmentContent(selectedItem.path);
-    window.parent.postMessage(html);
-    copyBtn.textContent = 'Inserted!';
+    daActions.sendHTML(html);
+    insertBtn.textContent = 'Inserted!';
     setTimeout(() => {
-      copyBtn.toggleAttribute('disabled', false);
-      copyBtn.textContent = 'Copy contents';
+      insertBtn.toggleAttribute('disabled', false);
+      insertBtn.textContent = 'Insert';
     }, 1500);
   } catch (err) {
     showStatus(`Failed: ${err.message}`, true);
-    copyBtn.toggleAttribute('disabled', false);
-    copyBtn.textContent = 'Copy contents';
+    insertBtn.toggleAttribute('disabled', false);
+    insertBtn.textContent = 'Insert';
   }
 });
