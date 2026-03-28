@@ -142,7 +142,8 @@ function blockToTable(block) {
 
 async function fetchFragmentContent(path) {
   const { org, repo, ref = 'main' } = daContext;
-  const url = `https://${ref}--${repo}--${org}.aem.page${path}.plain.html`;
+  const cleanPath = path.replace(/\.html$/, '');
+  const url = `https://${ref}--${repo}--${org}.aem.page${cleanPath}.plain.html`;
   const resp = await fetch(url);
   if (!resp.ok) throw new Error(`${resp.status} fetching preview`);
   const html = await resp.text();
