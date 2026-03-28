@@ -1,14 +1,18 @@
 *, *::before, *::after { box-sizing: border-box; }
 
 body {
+  display: none;
   margin: 0;
   font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
   font-size: 13px;
   background: #fff;
   color: #222;
   height: 100vh;
-  display: flex;
   flex-direction: column;
+}
+
+html.sl-loaded body {
+  display: flex;
 }
 
 header {
@@ -21,7 +25,7 @@ header {
   flex-shrink: 0;
 }
 
-header button.back {
+header sl-button.back {
   background: none;
   border: none;
   cursor: pointer;
@@ -31,8 +35,8 @@ header button.back {
   line-height: 1;
 }
 
-header button.back:hover { color: #000; }
-header button.back:disabled { opacity: 0; pointer-events: none; }
+header sl-button.back:hover { color: #000; }
+header sl-button.back[disabled] { opacity: 0; pointer-events: none; }
 
 .breadcrumb {
   flex: 1;
@@ -90,7 +94,7 @@ footer {
   gap: 8px;
 }
 
-footer button {
+footer sl-button {
   flex: 1;
   padding: 8px 6px;
   border: none;
@@ -100,7 +104,7 @@ footer button {
   font-weight: 500;
 }
 
-footer button:disabled {
+footer sl-button[disabled] {
   background: #e0e0e0;
   color: #aaa;
   cursor: not-allowed;
@@ -112,11 +116,11 @@ footer button:disabled {
   border: 1px solid #1473e6;
 }
 
-#btn-reference:not(:disabled):hover { background: #f0f6ff; }
+#btn-reference:not([disabled]):hover { background: #f0f6ff; }
 
 #btn-copy {
   background: #1473e6;
   color: #fff;
 }
 
-#btn-copy:not(:disabled):hover { background: #0d66d0; }
+#btn-copy:not([disabled]):hover { background: #0d66d0; }

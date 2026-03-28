@@ -5,18 +5,20 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Insert Fragment</title>
   <link rel="stylesheet" href="insert-fragment.css">
+  <script src="https://da.live/nx/utils/sdk.js"></script>
+  <script src="https://da.live/nx/public/sl/components.js" type="module"></script>
 </head>
 <body>
   <header>
-    <button class="back" id="btn-back" disabled>‹</button>
+    <sl-button class="back" id="btn-back" disabled>‹</sl-button>
     <span class="breadcrumb" id="breadcrumb">/fragments</span>
   </header>
 
   <div class="list" id="list"></div>
 
   <footer>
-    <button id="btn-reference" disabled>Reference</button>
-    <button id="btn-copy" disabled>Copy contents</button>
+    <sl-button id="btn-reference" disabled>Reference</sl-button>
+    <sl-button id="btn-copy" disabled>Copy contents</sl-button>
   </footer>
 
   <script type="module" src="insert-fragment.js"></script>

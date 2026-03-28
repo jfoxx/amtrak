@@ -1,7 +1,5 @@
-let daOrigin = '*';
-let org;
-let repo;
-let branch;
+let daContext;
+let daToken;
 let basePath = '/fragments';
 let currentPath = '';
 let selectedItem = null;
@@ -19,29 +17,16 @@ function showStatus(msg, isError = false) {
 
 function clearSelection() {
   selectedItem = null;
-  referenceBtn.disabled = true;
-  copyBtn.disabled = true;
-}
-
-function sendInsert(html) {
-  parent.postMessage(JSON.stringify({ action: 'da:insert', html }), daOrigin);
-}
-
-async function fetchFragmentContent(path) {
-  const previewOrigin = `https://${branch || 'main'}--${repo}--${org}.aem.page`;
-  const resp = await fetch(`${previewOrigin}${path}.plain.html`);
-  if (!resp.ok) throw new Error(`${resp.status} fetching preview`);
-  const html = await resp.text();
-  const doc = new DOMParser().parseFromString(html, 'text/html');
-  return doc.body.innerHTML;
+  referenceBtn.toggleAttribute('disabled', true);
+  copyBtn.toggleAttribute('disabled', true);
 }
 
 function selectPage(item, el) {
   listEl.querySelectorAll('.list-item').forEach((i) => i.classList.remove('is-selected'));
   el.classList.add('is-selected');
   selectedItem = { ...item, path: item.path || `${currentPath}/${item.name}` };
-  referenceBtn.disabled = false;
-  copyBtn.disabled = false;
+  referenceBtn.toggleAttribute('disabled', false);
+  copyBtn.toggleAttribute('disabled', false);
 }
 
 // onNavigate passed as arg to avoid circular reference with navigate()
@@ -83,12 +68,15 @@ async function navigate(path, push = true) {
   if (push) pathStack.push(currentPath);
   currentPath = path;
   breadcrumbEl.textContent = path;
-  backBtn.disabled = pathStack.length === 0;
+  backBtn.toggleAttribute('disabled', pathStack.length === 0);
   clearSelection();
   showStatus('Loading…');
   try {
+    const { org, repo } = daContext;
     const url = `https://admin.da.live/list/${org}/${repo}${path}`;
-    const resp = await fetch(url, { credentials: 'include' });
+    const resp = await fetch(url, {
+      headers: { Authorization: `Bearer ${daToken}` },
+    });
     if (!resp.ok) throw new Error(`${resp.status}`);
     const { data } = await resp.json();
     renderList(data || [], navigate);
@@ -99,8 +87,11 @@ async function navigate(path, push = true) {
 
 async function loadConfig() {
   try {
+    const { org, repo } = daContext;
     const url = `https://admin.da.live/source/${org}/${repo}/.da/insert-fragment.json`;
-    const resp = await fetch(url, { credentials: 'include' });
+    const resp = await fetch(url, {
+      headers: { Authorization: `Bearer ${daToken}` },
+    });
     if (resp.ok) {
       const json = await resp.json();
       if (json.basePath) basePath = json.basePath;
@@ -113,36 +104,23 @@ async function init() {
   navigate(basePath, false);
 }
 
-// --- DA context handshake ---
+async function fetchFragmentContent(path) {
+  const { org, repo, ref } = daContext;
+  const previewOrigin = `https://${ref || 'main'}--${repo}--${org}.aem.page`;
+  const resp = await fetch(`${previewOrigin}${path}.plain.html`);
+  if (!resp.ok) throw new Error(`${resp.status} fetching preview`);
+  const html = await resp.text();
+  const doc = new DOMParser().parseFromString(html, 'text/html');
+  return doc.body.innerHTML;
+}
+
+// DA sends { token, context } via postMessage
 window.addEventListener('message', (e) => {
-  let data;
-  try {
-    data = typeof e.data === 'string' ? JSON.parse(e.data) : e.data;
-  } catch { return; }
-
-  if (data.action === 'da:context') {
-    ({ org, repo, branch } = data);
-    daOrigin = e.origin || '*';
-    init();
-  }
+  if (!e.data?.token || !e.data?.context) return;
+  daToken = e.data.token;
+  daContext = e.data.context;
+  init();
 });
-
-parent.postMessage(JSON.stringify({ action: 'da:requestContext' }), '*');
-
-// Fallback for direct/test loading via query params
-setTimeout(() => {
-  if (!org) {
-    const params = new URLSearchParams(window.location.search);
-    org = params.get('org');
-    repo = params.get('repo');
-    branch = params.get('branch') || 'main';
-    if (org && repo) {
-      init();
-    } else {
-      showStatus('Waiting for DA context…');
-    }
-  }
-}, 300);
 
 backBtn.addEventListener('click', () => {
   if (!pathStack.length) return;
@@ -154,24 +132,24 @@ referenceBtn.addEventListener('click', () => {
   if (!selectedItem) return;
   const { path } = selectedItem;
   const html = `<table><tbody><tr><td>fragment</td></tr><tr><td><a href="${path}">${path}</a></td></tr></tbody></table>`;
-  sendInsert(html);
+  window.parent.postMessage(html);
 });
 
 copyBtn.addEventListener('click', async () => {
   if (!selectedItem) return;
-  copyBtn.disabled = true;
+  copyBtn.toggleAttribute('disabled', true);
   copyBtn.textContent = 'Fetching…';
   try {
     const html = await fetchFragmentContent(selectedItem.path);
-    sendInsert(html);
+    window.parent.postMessage(html);
     copyBtn.textContent = 'Inserted!';
     setTimeout(() => {
-      copyBtn.disabled = false;
+      copyBtn.toggleAttribute('disabled', false);
       copyBtn.textContent = 'Copy contents';
     }, 1500);
   } catch (err) {
     showStatus(`Failed: ${err.message}`, true);
-    copyBtn.disabled = false;
+    copyBtn.toggleAttribute('disabled', false);
     copyBtn.textContent = 'Copy contents';
   }
 });
