@@ -1,0 +1,115 @@
+.cc-hero {
+  --min-height: 420px;
+
+  position: relative;
+  min-height: var(--min-height);
+  overflow: hidden;
+  color: #fff;
+}
+
+/* ---- Background ---- */
+
+.cc-hero-bg {
+  position: absolute;
+  inset: 0;
+}
+
+.cc-hero-img {
+  position: absolute;
+  inset: 0;
+}
+
+.cc-hero-img picture {
+  position: absolute;
+  inset: 0;
+  display: block;
+}
+
+.cc-hero-img img {
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+/*
+ * Left image: base layer, always fully opaque.
+ * Acts as the foundation so the composite is never transparent.
+ */
+.cc-hero-img-left {
+  z-index: 1;
+}
+
+/*
+ * Right image: composited on top with a left-to-right gradient mask.
+ * Fades in from transparent at ~30% to fully opaque at ~62%,
+ * creating a smooth blend at the center seam.
+ */
+.cc-hero-img-right {
+  z-index: 2;
+  mask-image: linear-gradient(to right, transparent 30%, black 62%);
+}
+
+/* Subtle overall darkening so the box doesn't sit on a stark image */
+.cc-hero-bg::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  z-index: 3;
+  background: rgb(0 0 0 / 20%);
+}
+
+/* ---- Foreground ---- */
+
+.cc-hero-fg {
+  position: relative;
+  z-index: 4;
+  min-height: var(--min-height);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: var(--spacing-xl, 32px) var(--spacing-xxl, 48px);
+  box-sizing: border-box;
+}
+
+.cc-hero-fg > div {
+  width: var(--grid-container-width, 1200px);
+  max-width: 100%;
+  background: rgb(from var(--color-amtrak-medium-blue, #1b3a6b) r g b / 70%);
+  padding: var(--spacing-l, 24px) var(--spacing-xl, 32px);
+  border-radius: 6px;
+  backdrop-filter: blur(4px);
+}
+
+.cc-hero-fg h1,
+.cc-hero-fg h2,
+.cc-hero-fg h3 {
+  margin: 0;
+  color: #fff;
+  font-size: clamp(2.5rem, 5.5vw, 4.75rem);
+  line-height: 1.2;
+  text-wrap: balance;
+  text-align: center;
+}
+
+/* ---- Responsive ---- */
+
+@media (width < 600px) {
+  .cc-hero {
+    --min-height: 340px;
+  }
+
+  .cc-hero-img-right {
+    mask-image: linear-gradient(to right, transparent 15%, black 50%);
+  }
+
+  .cc-hero-fg {
+    padding: var(--spacing-l, 20px) var(--spacing-xl, 24px);
+  }
+}
+
+@media (width >= 900px) {
+  .cc-hero {
+    --min-height: 500px;
+  }
+}
