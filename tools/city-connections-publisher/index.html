@@ -4,37 +4,36 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>City Connections Publisher</title>
-  <style>body { display: none; }</style>
   <script src="https://da.live/nx/public/sl/components.js" type="module"></script>
   <link rel="stylesheet" href="index.css">
+  <link rel="icon" href="data:,">
 </head>
-<body>
-  <header>
-    <div class="header-title">
-      <div class="logo"></div>
+<body style="display: none;">
+  <div id="app">
+    <header class="cc-header">
       <h1>City Connections Publisher</h1>
-    </div>
-    <div class="token-section">
-      <sl-input id="token-input" type="password" placeholder="DA / IMS auth token"></sl-input>
-      <sl-button id="btn-save-token">Save Token</sl-button>
-    </div>
-  </header>
+    </header>
 
-  <div class="toolbar">
-    <sl-button id="btn-check-all">Check All Status</sl-button>
-    <sl-button id="btn-create-all">Create All Pages</sl-button>
-    <sl-button id="btn-preview-publish-all">Preview &amp; Publish All</sl-button>
-    <label class="filter-label">
-      <input type="checkbox" id="filter-missing">
-      Show only missing
-    </label>
-    <span id="summary" class="summary"></span>
-  </div>
+    <div class="cc-action-bar">
+      <div class="cc-action-buttons">
+        <sl-button id="btn-check-all">Check All Status</sl-button>
+        <sl-button id="btn-create-all">Create All Pages</sl-button>
+        <sl-button id="btn-preview-publish-all">Preview &amp; Publish All</sl-button>
+      </div>
+      <label class="cc-filter-label">
+        <input type="checkbox" id="filter-missing">
+        Show only missing
+      </label>
+      <span id="summary" class="cc-summary"></span>
+    </div>
 
-  <div id="container">
-    <div class="loading">
-      <div class="spinner"></div>
-      <p>Loading city data…</p>
+    <div class="cc-results-card">
+      <div id="container">
+        <div class="cc-loading">
+          <div class="cc-spinner"></div>
+          <p>Loading city data…</p>
+        </div>
+      </div>
     </div>
   </div>
 
