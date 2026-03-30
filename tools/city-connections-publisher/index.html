@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>City Connections Publisher</title>
+  <style>body { display: none; }</style>
+  <script src="https://da.live/nx/public/sl/components.js" type="module"></script>
+  <link rel="stylesheet" href="index.css">
+</head>
+<body>
+  <header>
+    <div class="header-title">
+      <div class="logo"></div>
+      <h1>City Connections Publisher</h1>
+    </div>
+    <div class="token-section">
+      <sl-input id="token-input" type="password" placeholder="DA / IMS auth token"></sl-input>
+      <sl-button id="btn-save-token">Save Token</sl-button>
+    </div>
+  </header>
+
+  <div class="toolbar">
+    <sl-button id="btn-check-all">Check All Status</sl-button>
+    <sl-button id="btn-create-all">Create All Pages</sl-button>
+    <sl-button id="btn-preview-publish-all">Preview &amp; Publish All</sl-button>
+    <label class="filter-label">
+      <input type="checkbox" id="filter-missing">
+      Show only missing
+    </label>
+    <span id="summary" class="summary"></span>
+  </div>
+
+  <div id="container">
+    <div class="loading">
+      <div class="spinner"></div>
+      <p>Loading city data…</p>
+    </div>
+  </div>
+
+  <script type="module" src="index.js"></script>
+</body>
+</html>
