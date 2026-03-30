@@ -35,8 +35,37 @@ const decorateArea = ({ area = document }) => {
 
 if (getMetadata('navbooking')) document.body.classList.add('navbooking');
 
+async function loadTarget() {
+  // Check for target metadata flag
+  const targetMeta = getMetadata('target');
+  if (targetMeta) {
+    // Overwrite target domains to be same origin
+    window.targetGlobalSettings = {
+      serverDomain: hostnames[0],
+      secureOnly: true,
+      overrideMboxEdgeServer: false,
+    };
+
+    // Import the local copy of at.js
+    await import('../deps/at/at.js');
+
+    // Request all the relevant offers for the page
+    const offers = await window.adobe.target.getOffers({
+      request: { execute: { pageLoad: {} } },
+    });
+
+    // Loop through them and inject if they exist
+    offers?.execute?.pageLoad?.options?.forEach((opt) => {
+      const { cssSelector, content } = opt.content[0];
+      const el = document.querySelector(cssSelector);
+      if (el) el.outerHTML = content;
+    });
+  }
+}
+
 export async function loadPage() {
   setConfig({ hostnames, locales, linkBlocks, components, decorateArea });
+  await loadTarget();
   await loadArea();
 }
 await loadPage();
