@@ -104,7 +104,7 @@ function buildUsePointsToggle() {
   return wrapper;
 }
 
-function buildStationInputs() {
+function buildStationInputs(from = '', to = '') {
   const wrapper = document.createElement('div');
   wrapper.className = 'bw-stations';
 
@@ -113,12 +113,14 @@ function buildStationInputs() {
   fromInput.placeholder = 'From';
   fromInput.className = 'bw-station-input';
   fromInput.setAttribute('aria-label', 'From station');
+  if (from) fromInput.value = from;
 
   const toInput = document.createElement('input');
   toInput.type = 'text';
   toInput.placeholder = 'To';
   toInput.className = 'bw-station-input';
   toInput.setAttribute('aria-label', 'To station');
+  if (to) toInput.value = to;
 
   const swapBtn = document.createElement('button');
   swapBtn.className = 'bw-swap-btn';
@@ -219,6 +221,10 @@ function buildSecondaryRow() {
 }
 
 export default function init(el) {
+  const cols = [...el.querySelectorAll(':scope > div > div')];
+  const from = cols[0]?.textContent.trim() || '';
+  const to = cols[1]?.textContent.trim() || '';
+
   el.textContent = '';
 
   const container = document.createElement('div');
@@ -244,7 +250,7 @@ export default function init(el) {
 
   const formRow = document.createElement('div');
   formRow.className = 'bw-form-row';
-  formRow.append(buildStationInputs(), buildDateInputs(), buildFindButton());
+  formRow.append(buildStationInputs(from, to), buildDateInputs(), buildFindButton());
 
   formAreaInner.append(pointsRow, formRow, buildSecondaryRow());
   formArea.append(formAreaInner);
