@@ -41,7 +41,7 @@ async function loadTarget() {
   if (targetMeta) {
     // Overwrite target domains to be same origin
     window.targetGlobalSettings = {
-   //   serverDomain: hostnames[0],
+    //serverDomain: hostnames[0],
       secureOnly: true,
       overrideMboxEdgeServer: false,
     };
