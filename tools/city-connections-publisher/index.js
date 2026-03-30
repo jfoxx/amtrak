@@ -1,3 +1,8 @@
+// eslint-disable-next-line import/no-unresolved
+import DA_SDK from 'https://da.live/nx/utils/sdk.js';
+// eslint-disable-next-line import/no-unresolved
+import { daFetch } from 'https://da.live/nx/utils/daFetch.js';
+
 const ORG = 'jfoxx';
 const REPO = 'amtrak';
 const REF = 'main';
@@ -8,33 +13,17 @@ const DA_SOURCE = `https://admin.da.live/source/${ORG}/${REPO}`;
 const AEM_PREVIEW = `https://admin.hlx.page/preview/${ORG}/${REPO}/${REF}`;
 const AEM_LIVE = `https://admin.hlx.page/live/${ORG}/${REPO}/${REF}`;
 
-let token = localStorage.getItem('cc-da-token') || '';
 let cityMap = {};
 let routes = [];
 let templateHtml = '';
 
 // ---- DOM refs ----
 const container = document.getElementById('container');
-const tokenInput = document.getElementById('token-input');
-const saveTokenBtn = document.getElementById('btn-save-token');
 const checkAllBtn = document.getElementById('btn-check-all');
 const createAllBtn = document.getElementById('btn-create-all');
 const publishAllBtn = document.getElementById('btn-preview-publish-all');
 const summaryEl = document.getElementById('summary');
 const filterCheckbox = document.getElementById('filter-missing');
-
-// Show body once components load
-document.body.classList.add('is-ready');
-
-// Pre-fill token
-if (token) tokenInput.value = token;
-
-saveTokenBtn.addEventListener('click', () => {
-  token = tokenInput.value.trim();
-  localStorage.setItem('cc-da-token', token);
-  saveTokenBtn.textContent = 'Saved!';
-  setTimeout(() => { saveTokenBtn.textContent = 'Save Token'; }, 1500);
-});
 
 filterCheckbox.addEventListener('change', applyFilter);
 
@@ -47,10 +36,17 @@ async function fetchCities() {
 }
 
 async function fetchTemplate() {
-  const headers = token ? { Authorization: `Bearer ${token}` } : {};
-  const resp = await fetch(TEMPLATE_URL, { headers });
+  const resp = await daFetch(TEMPLATE_URL);
   if (!resp.ok) throw new Error(`Failed to fetch template (${resp.status})`);
   return resp.text();
+}
+
+function slugify(name) {
+  return name
+    .toLowerCase()
+    .replace(/[()]/g, '')
+    .replace(/[^a-z0-9]+/g, '-')
+    .replace(/^-+|-+$/g, '');
 }
 
 function buildRoutes(cities) {
@@ -64,14 +60,15 @@ function buildRoutes(cities) {
 
     for (const toCode of connected) {
       const toCity = cityMap[toCode];
-      if (!toCity) continue; // skip cities not in the dataset
+      if (!toCity) continue;
 
+      const slug = `${slugify(city['City'])}-to-${slugify(toCity['City'])}-by-train`;
       list.push({
         fromCode,
         toCode,
         fromCity: city['City'],
         toCity: toCity['City'],
-        path: `/city-connections/${fromCode.toLowerCase()}-${toCode.toLowerCase()}`,
+        path: `/city-connections/${slug}`,
         status: 'unknown',
         statusText: 'Unknown',
       });
@@ -81,18 +78,29 @@ function buildRoutes(cities) {
 }
 
 function fillTemplate(from, to) {
-  return templateHtml
+  const html = templateHtml
     .replaceAll('{{city1}}', from['City'])
     .replaceAll('{{city2}}', to['City'])
     .replaceAll('{{city-code-one}}', from['Station Code'])
     .replaceAll('{{city-code-two}}', to['Station Code'])
     .replaceAll('{{description}}', to['Description']);
+
+  const doc = new DOMParser().parseFromString(html, 'text/html');
+  const pictures = [...doc.querySelectorAll('.cc-hero picture')];
+
+  [[pictures[0], from.image], [pictures[1], to.image]].forEach(([pic, src]) => {
+    if (!pic || !src) return;
+    pic.querySelectorAll('source').forEach((s) => s.setAttribute('srcset', src));
+    const img = pic.querySelector('img');
+    if (img) img.setAttribute('src', src);
+  });
+
+  return doc.body.outerHTML;
 }
 
 // ---- DA / AEM API ----
 async function checkPageExists(path) {
-  const headers = token ? { Authorization: `Bearer ${token}` } : {};
-  const resp = await fetch(`${DA_SOURCE}${path}.html`, { method: 'HEAD', headers });
+  const resp = await daFetch(`${DA_SOURCE}${path}.html`, { method: 'HEAD' });
   return resp.ok;
 }
 
@@ -100,27 +108,17 @@ async function savePage(path, html) {
   const blob = new Blob([html], { type: 'text/html' });
   const form = new FormData();
   form.append('data', blob, 'index.html');
-  const resp = await fetch(`${DA_SOURCE}${path}.html`, {
-    method: 'PUT',
-    headers: { Authorization: `Bearer ${token}` },
-    body: form,
-  });
+  const resp = await daFetch(`${DA_SOURCE}${path}.html`, { method: 'PUT', body: form });
   return resp.ok;
 }
 
 async function previewPage(path) {
-  const resp = await fetch(`${AEM_PREVIEW}${path}`, {
-    method: 'POST',
-    headers: { Authorization: `Bearer ${token}` },
-  });
+  const resp = await daFetch(`${AEM_PREVIEW}${path}`, { method: 'POST' });
   return resp.ok;
 }
 
 async function publishPage(path) {
-  const resp = await fetch(`${AEM_LIVE}${path}`, {
-    method: 'POST',
-    headers: { Authorization: `Bearer ${token}` },
-  });
+  const resp = await daFetch(`${AEM_LIVE}${path}`, { method: 'POST' });
   return resp.ok;
 }
 
@@ -131,14 +129,6 @@ function setStatus(index, status, text) {
   refreshRow(index);
   updateSummary();
   applyFilter();
-}
-
-function requireToken() {
-  if (!token) {
-    alert('Please enter and save your DA auth token first.');
-    return false;
-  }
-  return true;
 }
 
 // ---- Render ----
@@ -171,9 +161,15 @@ function renderTable() {
   updateSummary();
 }
 
+const STATUSES_WITH_EDIT     = new Set(['exists', 'created', 'previewed', 'published']);
+const STATUSES_WITH_PREVIEW  = new Set(['previewed', 'published']);
+const STATUSES_WITH_LIVE     = new Set(['published']);
+
 function buildRow(index) {
   const { fromCity, fromCode, toCity, toCode, path, status, statusText } = routes[index];
-  const viewHref = `https://${REF}--${REPO}--${ORG}.aem.page${path}`;
+  const editHref    = `https://da.live/edit#/${ORG}/${REPO}${path}`;
+  const previewHref = `https://${REF}--${REPO}--${ORG}.aem.page${path}`;
+  const liveHref    = `https://${REF}--${REPO}--${ORG}.aem.live${path}`;
 
   const tr = document.createElement('tr');
   tr.id = `route-${index}`;
@@ -196,7 +192,9 @@ function buildRow(index) {
       <sl-button class="btn-create" data-index="${index}">Create</sl-button>
       <sl-button class="btn-preview" data-index="${index}">Preview</sl-button>
       <sl-button class="btn-publish" data-index="${index}">Publish</sl-button>
-      <a class="view-link" href="${viewHref}" target="_blank" ${status !== 'published' ? 'hidden' : ''}>View ↗</a>
+      <a class="row-link link-edit" href="${editHref}" target="_blank" ${STATUSES_WITH_EDIT.has(status) ? '' : 'hidden'}>Edit ↗</a>
+      <a class="row-link link-preview" href="${previewHref}" target="_blank" ${STATUSES_WITH_PREVIEW.has(status) ? '' : 'hidden'}>aem.page ↗</a>
+      <a class="row-link link-live" href="${liveHref}" target="_blank" ${STATUSES_WITH_LIVE.has(status) ? '' : 'hidden'}>aem.live ↗</a>
     </td>
   `;
 
@@ -213,12 +211,12 @@ function refreshRow(index) {
   if (!tr) return;
 
   const { status, statusText } = routes[index];
-  const badge = tr.querySelector('.status-badge');
-  badge.className = `status-badge badge-${status}`;
-  badge.textContent = statusText;
+  tr.querySelector('.status-badge').className = `status-badge badge-${status}`;
+  tr.querySelector('.status-badge').textContent = statusText;
 
-  const viewLink = tr.querySelector('.view-link');
-  viewLink.hidden = status !== 'published';
+  tr.querySelector('.link-edit').hidden    = !STATUSES_WITH_EDIT.has(status);
+  tr.querySelector('.link-preview').hidden = !STATUSES_WITH_PREVIEW.has(status);
+  tr.querySelector('.link-live').hidden    = !STATUSES_WITH_LIVE.has(status);
 }
 
 function applyFilter() {
@@ -236,9 +234,7 @@ function updateSummary() {
     acc[r.status] = (acc[r.status] || 0) + 1;
     return acc;
   }, {});
-  const parts = Object.entries(counts)
-    .map(([k, v]) => `${v} ${k}`)
-    .join(' · ');
+  const parts = Object.entries(counts).map(([k, v]) => `${v} ${k}`).join(' · ');
   summaryEl.textContent = `${routes.length} routes — ${parts}`;
 }
 
@@ -254,10 +250,9 @@ async function handleCheck(index) {
 }
 
 async function handleCreate(index) {
-  if (!requireToken()) return;
   if (!templateHtml) {
     setStatus(index, 'creating', 'Loading template…');
-    try { templateHtml = await fetchTemplate(); } catch (e) {
+    try { templateHtml = await fetchTemplate(); } catch {
       setStatus(index, 'error', 'Template error');
       return;
     }
@@ -274,7 +269,6 @@ async function handleCreate(index) {
 }
 
 async function handlePreview(index) {
-  if (!requireToken()) return;
   setStatus(index, 'previewing', 'Previewing…');
   try {
     const ok = await previewPage(routes[index].path);
@@ -285,7 +279,6 @@ async function handlePreview(index) {
 }
 
 async function handlePublish(index) {
-  if (!requireToken()) return;
   setStatus(index, 'publishing', 'Publishing…');
   try {
     const ok = await publishPage(routes[index].path);
@@ -296,30 +289,28 @@ async function handlePublish(index) {
 }
 
 // ---- Bulk actions ----
+async function ensureTemplate() {
+  if (templateHtml) return true;
+  try {
+    templateHtml = await fetchTemplate();
+    return true;
+  } catch (e) {
+    container.innerHTML = `<p class="error-msg">Failed to load template: ${e.message}</p>`;
+    return false;
+  }
+}
+
 checkAllBtn.addEventListener('click', async () => {
   for (let i = 0; i < routes.length; i++) await handleCheck(i);
 });
 
 createAllBtn.addEventListener('click', async () => {
-  if (!requireToken()) return;
-  // Load template once before the loop
-  if (!templateHtml) {
-    try { templateHtml = await fetchTemplate(); } catch (e) {
-      alert(`Failed to load template: ${e.message}`);
-      return;
-    }
-  }
+  if (!await ensureTemplate()) return;
   for (let i = 0; i < routes.length; i++) await handleCreate(i);
 });
 
 publishAllBtn.addEventListener('click', async () => {
-  if (!requireToken()) return;
-  if (!templateHtml) {
-    try { templateHtml = await fetchTemplate(); } catch (e) {
-      alert(`Failed to load template: ${e.message}`);
-      return;
-    }
-  }
+  if (!await ensureTemplate()) return;
   for (let i = 0; i < routes.length; i++) {
     await handleCreate(i);
     if (routes[i].status === 'created') {
@@ -329,8 +320,9 @@ publishAllBtn.addEventListener('click', async () => {
   }
 });
 
-// ---- Init ----
+// ---- Init (gated on DA_SDK) ----
 async function init() {
+  await DA_SDK;
   try {
     const cities = await fetchCities();
     routes = buildRoutes(cities);
@@ -338,6 +330,7 @@ async function init() {
   } catch (err) {
     container.innerHTML = `<p class="error-msg">Failed to load: ${err.message}</p>`;
   }
+  document.body.style.display = '';
 }
 
 init();
