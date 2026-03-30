@@ -170,6 +170,27 @@
       text-align: center;
     }
   }
+
+  &.box {
+    max-width: var(--grid-container-width);
+    margin: var(--spacing-xl) auto;
+    border-radius: 12px;
+
+    .hero-background::after {
+      display: none;
+    }
+
+    .hero-foreground {
+      background: none;
+
+      .fg-text {
+        background: rgb(from var(--color-amtrak-medium-blue) r g b / 70%);
+        padding: var(--spacing-l);
+        border-radius: 6px;
+        backdrop-filter: blur(4px);
+      }
+    }
+  }
 }
 
 @media (width >= 600px) {
