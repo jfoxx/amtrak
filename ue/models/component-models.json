@@ -1,0 +1,4 @@
+[
+  { "...": "./section.json#/models" },
+  { "...": "./blocks/*.json#/models" }
+]

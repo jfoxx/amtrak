@@ -1,0 +1,50 @@
+{
+  "definitions": [
+    {
+      "title": "Hero",
+      "id": "hero",
+      "model": "hero",
+      "plugins": {
+        "da": {
+          "name": "hero",
+          "rows": 2,
+          "columns": 1,
+          "fields": [
+            { "name": "backgroundImage", "selector": "div:nth-child(1)>picture>img[src]" },
+            { "name": "backgroundImageAlt", "selector": "div:nth-child(1)>picture>img[alt]" },
+            { "name": "text", "selector": "div:nth-child(2)" }
+          ]
+        }
+      }
+    }
+  ],
+  "models": [
+    {
+      "id": "hero",
+      "fields": [
+        {
+          "component": "reference",
+          "valueType": "string",
+          "name": "backgroundImage",
+          "label": "Background Image",
+          "multi": false
+        },
+        {
+          "component": "text",
+          "valueType": "string",
+          "name": "backgroundImageAlt",
+          "label": "Background Image Alt",
+          "value": ""
+        },
+        {
+          "component": "richtext",
+          "valueType": "string",
+          "name": "text",
+          "value": "",
+          "label": "Foreground Text"
+        }
+      ]
+    }
+  ],
+  "filters": []
+}

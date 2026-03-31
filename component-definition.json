@@ -1,0 +1,145 @@
+{
+  "groups": [
+    {
+      "title": "Sections",
+      "id": "sections",
+      "components": [
+        {
+          "title": "Section",
+          "id": "section",
+          "plugins": {
+            "da": {
+              "unsafeHTML": "<div></div>"
+            }
+          },
+          "filter": "section",
+          "model": "section"
+        }
+      ]
+    },
+    {
+      "title": "Blocks",
+      "id": "blocks",
+      "components": [
+        {
+          "title": "Accordion",
+          "id": "accordion",
+          "model": "accordion",
+          "filter": "accordion",
+          "plugins": {
+            "da": {
+              "name": "accordion",
+              "rows": 1,
+              "columns": 2
+            }
+          }
+        },
+        {
+          "title": "Accordion Item",
+          "id": "accordion-item",
+          "model": "accordion-item",
+          "plugins": {
+            "da": {
+              "name": "accordion-item",
+              "rows": 1,
+              "columns": 2,
+              "fields": [
+                {
+                  "name": "summary",
+                  "selector": "div:nth-child(1)"
+                },
+                {
+                  "name": "body",
+                  "selector": "div:nth-child(2)"
+                }
+              ]
+            }
+          }
+        },
+        {
+          "title": "Hero",
+          "id": "hero",
+          "model": "hero",
+          "plugins": {
+            "da": {
+              "name": "hero",
+              "rows": 2,
+              "columns": 1,
+              "fields": [
+                {
+                  "name": "backgroundImage",
+                  "selector": "div:nth-child(1)>picture>img[src]"
+                },
+                {
+                  "name": "backgroundImageAlt",
+                  "selector": "div:nth-child(1)>picture>img[alt]"
+                },
+                {
+                  "name": "text",
+                  "selector": "div:nth-child(2)"
+                }
+              ]
+            }
+          }
+        },
+        {
+          "title": "Promo Carousel",
+          "id": "promo-carousel",
+          "model": "promo-carousel",
+          "filter": "promo-carousel",
+          "plugins": {
+            "da": {
+              "name": "promo-carousel",
+              "rows": 1,
+              "columns": 1
+            }
+          }
+        },
+        {
+          "title": "Promo Carousel Item",
+          "id": "promo-carousel-item",
+          "model": "promo-carousel-item",
+          "plugins": {
+            "da": {
+              "name": "promo-carousel-item",
+              "rows": 1,
+              "columns": 1,
+              "fields": [
+                {
+                  "name": "path",
+                  "selector": "div:nth-child(1)>a[href]"
+                }
+              ]
+            }
+          }
+        },
+        {
+          "title": "Promo",
+          "id": "promo",
+          "model": "promo",
+          "plugins": {
+            "da": {
+              "name": "promo",
+              "rows": 1,
+              "columns": 2,
+              "fields": [
+                {
+                  "name": "image",
+                  "selector": "div:nth-child(1)>picture>img[src]"
+                },
+                {
+                  "name": "imageAlt",
+                  "selector": "div:nth-child(1)>picture>img[alt]"
+                },
+                {
+                  "name": "text",
+                  "selector": "div:nth-child(2)"
+                }
+              ]
+            }
+          }
+        }
+      ]
+    }
+  ]
+}
