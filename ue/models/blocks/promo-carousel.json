@@ -1,0 +1,53 @@
+{
+  "definitions": [
+    {
+      "title": "Promo Carousel",
+      "id": "promo-carousel",
+      "model": "promo-carousel",
+      "filter": "promo-carousel",
+      "plugins": {
+        "da": {
+          "name": "promo-carousel",
+          "rows": 1,
+          "columns": 1
+        }
+      }
+    },
+    {
+      "title": "Promo Carousel Item",
+      "id": "promo-carousel-item",
+      "model": "promo-carousel-item",
+      "plugins": {
+        "da": {
+          "name": "promo-carousel-item",
+          "rows": 1,
+          "columns": 1,
+          "fields": [
+            { "name": "path", "selector": "div:nth-child(1)>a[href]" }
+          ]
+        }
+      }
+    }
+  ],
+  "models": [
+    {
+      "id": "promo-carousel-item",
+      "fields": [
+        {
+          "component": "text",
+          "valueType": "string",
+          "name": "path",
+          "value": "",
+          "label": "Promo Page Path",
+          "required": true
+        }
+      ]
+    }
+  ],
+  "filters": [
+    {
+      "id": "promo-carousel",
+      "components": ["promo-carousel-item"]
+    }
+  ]
+}

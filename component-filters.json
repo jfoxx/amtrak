@@ -1,0 +1,29 @@
+[
+  {
+    "id": "main",
+    "components": [
+      "section"
+    ]
+  },
+  {
+    "id": "section",
+    "components": [
+      "accordion",
+      "hero",
+      "promo",
+      "promo-carousel"
+    ]
+  },
+  {
+    "id": "accordion",
+    "components": [
+      "accordion-item"
+    ]
+  },
+  {
+    "id": "promo-carousel",
+    "components": [
+      "promo-carousel-item"
+    ]
+  }
+]
