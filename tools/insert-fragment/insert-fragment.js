@@ -167,10 +167,12 @@ async function fetchFragmentContent(path) {
   const html = await resp.text();
   const doc = new DOMParser().parseFromString(html, 'text/html');
   const sections = [...doc.querySelectorAll('body > div, main > div')];
-  const parts = sections.flatMap((section) => [...section.children].map((child) => {
-    if (child.nodeName === 'DIV') return getBlockTableHtml(child).outerHTML;
-    return child.outerHTML;
-  }));
+  const parts = sections.flatMap((section) => [...section.children]
+    .filter((child) => !(child.nodeName === 'DIV' && child.classList[0] === 'metadata'))
+    .map((child) => {
+      if (child.nodeName === 'DIV') return getBlockTableHtml(child).outerHTML;
+      return child.outerHTML;
+    }));
   return parts.join('\n');
 }
 
