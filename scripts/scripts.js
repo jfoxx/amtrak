@@ -56,6 +56,7 @@ async function loadTarget() {
 
     // Loop through them and inject if they exist
     offers?.execute?.pageLoad?.options?.forEach((opt) => {
+      if (!opt.content?.[0] || opt.content.length === 0) return;
       const { cssSelector, content } = opt.content[0];
       const el = document.querySelector(cssSelector);
       if (el) el.outerHTML = content;
