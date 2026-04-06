@@ -7,12 +7,15 @@ let daContext;
 let daToken;
 
 /**
- * Parse org, site, and page path from a DA pathname.
- * e.g. /jfoxx/amtrak/promotions/easter-weekend
- *   → { org: 'jfoxx', site: 'amtrak', pagePath: '/promotions/easter-weekend' }
+ * Parse org, site, and page path from a DA URL or pathname.
+ * Handles full URLs: https://da.live/edit#/jfoxx/amtrak/promotions/easter-weekend
+ * and plain paths:   /jfoxx/amtrak/promotions/easter-weekend
  */
 function parseDaPathname(pathname) {
-  const parts = (pathname || '').replace(/\.html$/, '').split('/').filter(Boolean);
+  const raw = (pathname || '').replace(/\.html$/, '');
+  // Strip everything up to and including 'edit#' if present
+  const path = raw.includes('edit#') ? raw.split('edit#')[1] : raw;
+  const parts = path.split('/').filter(Boolean);
   const [org, site, ...rest] = parts;
   return { org, site, pagePath: `/${rest.join('/')}` };
 }
