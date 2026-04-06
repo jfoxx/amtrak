@@ -182,62 +182,46 @@ function runChecks(rule, blockNames, metadata) {
 // Rendering
 // ---------------------------------------------------------------------------
 
-function renderIssueItem(issue) {
-  const listItems = issue.items
-    ? `<ul class="item-list">${issue.items.map((i) => `<li><code>${i}</code></li>`).join('')}</ul>`
-    : '';
+function renderCategory({ label, items, isPass }) {
+  const icon = isPass ? 'icons/CheckmarkSize100.svg' : 'icons/CrossSize100.svg';
+  const iconAlt = isPass ? 'Pass' : 'Fail';
+  const rowClass = isPass ? 'cat-pass' : 'cat-fail';
+  const rows = items.map((item) => `
+    <div class="cat-item">
+      <span class="cat-item-label">${item}</span>
+    </div>`).join('');
+
   return `
-    <div class="check-row check-fail">
-      <img class="check-icon" src="icons/CrossSize100.svg" alt="Fail">
-      <div class="check-content">
-        <strong>${issue.category}</strong>
-        <span class="check-detail">${issue.detail}</span>
-        ${listItems}
-      </div>
-    </div>`;
+    <details class="category ${rowClass}">
+      <summary class="category-summary">
+        <span class="cat-label">${label}</span>
+        <span class="cat-right">
+          <img class="cat-icon" src="${icon}" alt="${iconAlt}">
+          <span class="cat-count">${items.length}</span>
+        </span>
+      </summary>
+      <div class="cat-body">${rows}</div>
+    </details>`;
 }
 
-function renderPassItem(pass) {
-  return `
-    <div class="check-row check-pass">
-      <img class="check-icon" src="icons/CheckmarkSize100.svg" alt="Pass">
-      <div class="check-content">
-        <strong>${pass.category}</strong>
-        <span class="check-detail">${pass.detail}</span>
-      </div>
-    </div>`;
-}
-
-function renderResults({ rule, pagePath, blockNames, metadata, issues, passes }) {
-  const failed = issues.length > 0;
-  const statusLabel = failed ? 'Fail' : 'Pass';
-  const statusClass = failed ? 'badge-fail' : 'badge-pass';
+function renderResults({ rule, pagePath, issues, passes }) {
+  const allCategories = [
+    ...issues.map(({ category, items }) => renderCategory({ label: category, items, isPass: false })),
+    ...passes.map(({ category, detail }) => renderCategory({ label: category, items: detail.split(', '), isPass: true })),
+  ];
 
   resultsEl.innerHTML = `
-    <div class="result-summary">
-      <span class="status-badge ${statusClass}">${statusLabel}</span>
-      <div class="summary-meta">
-        <span class="summary-path">${pagePath}</span>
-        <span class="summary-rule">Rule: <code>${rule.path}</code></span>
-      </div>
+    <div class="path-row">
+      <span class="path-label">${pagePath}</span>
+      <span class="path-rule"><code>${rule.path}</code></span>
     </div>
-
-    <div class="found-info">
-      <div class="found-row">
-        <span class="found-label">Blocks found</span>
-        <span class="found-value">${blockNames.length ? blockNames.join(', ') : '<em>none</em>'}</span>
-      </div>
-      <div class="found-row">
-        <span class="found-label">Metadata keys</span>
-        <span class="found-value">${Object.keys(metadata).length ? Object.keys(metadata).join(', ') : '<em>none</em>'}</span>
-      </div>
-    </div>
-
-    <div class="check-list">
-      ${issues.map(renderIssueItem).join('')}
-      ${passes.map(renderPassItem).join('')}
+    <div class="category-list">
+      ${allCategories.join('')}
     </div>
   `;
+
+  // Auto-open failing categories
+  resultsEl.querySelectorAll('.cat-fail').forEach((el) => el.setAttribute('open', ''));
 }
 
 function renderInfo(msg) {

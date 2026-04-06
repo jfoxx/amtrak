@@ -10,13 +10,10 @@
 </head>
 <body style="display: none;">
   <div id="app">
-    <header class="gov-header">
-      <h1>Governance Check</h1>
-      <sl-button id="btn-run" variant="cta">Run Check</sl-button>
-    </header>
-    <div id="results" class="results">
-      <p class="idle-message">Click <strong>Run Check</strong> to scan this page against your governance rules.</p>
+    <div class="action-bar">
+      <sl-button id="btn-run">Run Check</sl-button>
     </div>
+    <div id="results" class="results"></div>
   </div>
   <script type="module" src="governance.js"></script>
 </body>
