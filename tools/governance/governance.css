@@ -81,10 +81,8 @@ body {
 
 .cat-label {
   font-weight: 700;
-  font-size: 13px;
-  text-transform: uppercase;
-  letter-spacing: 0.04em;
-  color: #555;
+  font-size: 14px;
+  color: #2c2c2c;
 }
 
 .cat-right {
