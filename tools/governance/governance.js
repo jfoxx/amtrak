@@ -6,6 +6,17 @@ const CONFIG_PATH = '/.da/governance-config.json';
 let daContext;
 let daToken;
 
+/**
+ * Parse org, site, and page path from a DA pathname.
+ * e.g. /jfoxx/amtrak/promotions/easter-weekend
+ *   → { org: 'jfoxx', site: 'amtrak', pagePath: '/promotions/easter-weekend' }
+ */
+function parseDaPathname(pathname) {
+  const parts = (pathname || '').replace(/\.html$/, '').split('/').filter(Boolean);
+  const [org, site, ...rest] = parts;
+  return { org, site, pagePath: `/${rest.join('/')}` };
+}
+
 const runBtn = document.getElementById('btn-run');
 const resultsEl = document.getElementById('results');
 
@@ -41,8 +52,8 @@ function matchesPath(pattern, pagePath) {
 // ---------------------------------------------------------------------------
 
 async function loadConfig() {
-  const { org, repo } = daContext;
-  const url = `https://content.da.live/${org}/${repo}${CONFIG_PATH}`;
+  const { org, site } = parseDaPathname(daContext.pathname);
+  const url = `https://content.da.live/${org}/${site}${CONFIG_PATH}`;
   try {
     const resp = await fetch(url, {
       headers: { Authorization: `Bearer ${daToken}` },
@@ -67,9 +78,8 @@ function findMatchingRule(rules, pagePath) {
 // ---------------------------------------------------------------------------
 
 async function fetchPageHTML() {
-  const { org, repo, pathname } = daContext;
-  const cleanPath = pathname.replace(/\.html$/, '');
-  const url = `https://content.da.live/${org}/${repo}${cleanPath}`;
+  const { org, site, pagePath } = parseDaPathname(daContext.pathname);
+  const url = `https://content.da.live/${org}/${site}${pagePath}`;
   const resp = await fetch(url, {
     headers: { Authorization: `Bearer ${daToken}` },
   });
@@ -257,7 +267,7 @@ async function runCheck() {
       return;
     }
 
-    const pagePath = daContext.pathname.replace(/\.html$/, '');
+    const { pagePath } = parseDaPathname(daContext.pathname);
     const rule = findMatchingRule(rules, pagePath);
 
     if (!rule) {
