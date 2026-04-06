@@ -284,6 +284,12 @@ async function runCheck() {
     }
 
     const pagePath = getPagePath(daContext.pathname);
+    // eslint-disable-next-line no-console
+    console.log('[governance] context.pathname:', daContext.pathname);
+    // eslint-disable-next-line no-console
+    console.log('[governance] resolved pagePath:', pagePath);
+    // eslint-disable-next-line no-console
+    console.log('[governance] rules:', JSON.stringify(rules));
     const rule = findMatchingRule(rules, pagePath);
 
     if (!rule) {
