@@ -7,17 +7,20 @@ let daContext;
 let daToken;
 
 /**
- * Parse org, site, and page path from a DA URL or pathname.
- * Handles full URLs: https://da.live/edit#/jfoxx/amtrak/promotions/easter-weekend
- * and plain paths:   /jfoxx/amtrak/promotions/easter-weekend
+ * Extract org and site from the AEM preview hostname.
+ * e.g. main--amtrak--jfoxx.aem.live → { org: 'jfoxx', site: 'amtrak' }
  */
-function parseDaPathname(pathname) {
-  const raw = (pathname || '').replace(/\.html$/, '');
-  // Strip everything up to and including 'edit#' if present
-  const path = raw.includes('edit#') ? raw.split('edit#')[1] : raw;
-  const parts = path.split('/').filter(Boolean);
-  const [org, site, ...rest] = parts;
-  return { org, site, pagePath: `/${rest.join('/')}` };
+function getOrgAndSite() {
+  const parts = window.location.hostname.split('--');
+  if (parts.length >= 3) {
+    return { org: parts[2].split('.')[0], site: parts[1] };
+  }
+  return { org: undefined, site: undefined };
+}
+
+/** Normalize the page path from context — strip .html and leading org/site if present. */
+function getPagePath(pathname) {
+  return (pathname || '/').replace(/\.html$/, '');
 }
 
 const runBtn = document.getElementById('btn-run');
@@ -55,7 +58,7 @@ function matchesPath(pattern, pagePath) {
 // ---------------------------------------------------------------------------
 
 async function loadConfig() {
-  const { org, site } = parseDaPathname(daContext.pathname);
+  const { org, site } = getOrgAndSite();
   const url = `https://content.da.live/${org}/${site}${CONFIG_PATH}`;
   try {
     const resp = await fetch(url, {
@@ -81,7 +84,8 @@ function findMatchingRule(rules, pagePath) {
 // ---------------------------------------------------------------------------
 
 async function fetchPageHTML() {
-  const { org, site, pagePath } = parseDaPathname(daContext.pathname);
+  const { org, site } = getOrgAndSite();
+  const pagePath = getPagePath(daContext.pathname);
   const url = `https://content.da.live/${org}/${site}${pagePath}`;
   const resp = await fetch(url, {
     headers: { Authorization: `Bearer ${daToken}` },
@@ -270,7 +274,7 @@ async function runCheck() {
       return;
     }
 
-    const { pagePath } = parseDaPathname(daContext.pathname);
+    const pagePath = getPagePath(daContext.pathname);
     const rule = findMatchingRule(rules, pagePath);
 
     if (!rule) {
