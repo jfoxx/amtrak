@@ -285,7 +285,7 @@ async function runCheck() {
 
     const pagePath = getPagePath(daContext.pathname);
     // eslint-disable-next-line no-console
-    console.log('[governance] context.pathname:', daContext.pathname);
+    console.log('[governance] full context:', JSON.stringify(daContext));
     // eslint-disable-next-line no-console
     console.log('[governance] resolved pagePath:', pagePath);
     // eslint-disable-next-line no-console
