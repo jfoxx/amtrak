@@ -192,17 +192,18 @@ body {
 }
 
 .check-icon {
-  font-size: 16px;
-  line-height: 1.2;
+  width: 16px;
+  height: 16px;
   flex-shrink: 0;
+  margin-top: 1px;
 }
 
 .check-fail .check-icon {
-  color: #c00;
+  filter: invert(13%) sepia(96%) saturate(7492%) hue-rotate(1deg) brightness(90%) contrast(113%);
 }
 
 .check-pass .check-icon {
-  color: #1a7a3e;
+  filter: invert(33%) sepia(56%) saturate(548%) hue-rotate(95deg) brightness(90%) contrast(90%);
 }
 
 .check-content {

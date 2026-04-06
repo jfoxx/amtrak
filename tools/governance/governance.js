@@ -188,7 +188,7 @@ function renderIssueItem(issue) {
     : '';
   return `
     <div class="check-row check-fail">
-      <span class="check-icon" aria-hidden="true">✗</span>
+      <img class="check-icon" src="icons/CrossSize100.svg" alt="Fail">
       <div class="check-content">
         <strong>${issue.category}</strong>
         <span class="check-detail">${issue.detail}</span>
@@ -200,7 +200,7 @@ function renderIssueItem(issue) {
 function renderPassItem(pass) {
   return `
     <div class="check-row check-pass">
-      <span class="check-icon" aria-hidden="true">✓</span>
+      <img class="check-icon" src="icons/CheckmarkSize100.svg" alt="Pass">
       <div class="check-content">
         <strong>${pass.category}</strong>
         <span class="check-detail">${pass.detail}</span>
