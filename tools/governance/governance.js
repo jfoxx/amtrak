@@ -18,9 +18,18 @@ function getOrgAndSite() {
   return { org: undefined, site: undefined };
 }
 
-/** Normalize the page path from context — strip .html and leading org/site if present. */
+/**
+ * Extract the page path from context pathname.
+ * Handles full DA URLs: https://da.live/edit#/jfoxx/amtrak/promotions/easter-weekend
+ *   → /promotions/easter-weekend
+ */
 function getPagePath(pathname) {
-  return (pathname || '/').replace(/\.html$/, '');
+  const raw = (pathname || '/').replace(/\.html$/, '');
+  if (raw.includes('edit#')) {
+    const parts = raw.split('edit#')[1].split('/').filter(Boolean);
+    return `/${parts.slice(2).join('/')}`; // drop org + site segments
+  }
+  return raw;
 }
 
 const runBtn = document.getElementById('btn-run');
