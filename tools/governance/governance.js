@@ -6,30 +6,15 @@ const CONFIG_PATH = '/.da/governance-config.json';
 let daContext;
 let daToken;
 
-/**
- * Extract org and site from the AEM preview hostname.
- * e.g. main--amtrak--jfoxx.aem.live → { org: 'jfoxx', site: 'amtrak' }
- */
 function getOrgAndSite() {
-  const parts = window.location.hostname.split('--');
-  if (parts.length >= 3) {
-    return { org: parts[2].split('.')[0], site: parts[1] };
-  }
-  return { org: undefined, site: undefined };
+  return { org: daContext.org, site: daContext.site };
 }
 
 /**
  * Extract the page path from context pathname.
- * Handles full DA URLs: https://da.live/edit#/jfoxx/amtrak/promotions/easter-weekend
- *   → /promotions/easter-weekend
  */
-function getPagePath(pathname) {
-  const raw = (pathname || '/').replace(/\.html$/, '');
-  if (raw.includes('edit#')) {
-    const parts = raw.split('edit#')[1].split('/').filter(Boolean);
-    return `/${parts.slice(2).join('/')}`; // drop org + site segments
-  }
-  return raw;
+function getPagePath(path) {
+  return (path || '/').replace(/\.html$/, '');
 }
 
 const runBtn = document.getElementById('btn-run');
@@ -94,7 +79,7 @@ function findMatchingRule(rules, pagePath) {
 
 async function fetchPageHTML() {
   const { org, site } = getOrgAndSite();
-  const pagePath = getPagePath(daContext.pathname);
+  const pagePath = getPagePath(daContext.path);
   const url = `https://content.da.live/${org}/${site}${pagePath}`;
   const resp = await fetch(url, {
     headers: { Authorization: `Bearer ${daToken}` },
@@ -283,13 +268,7 @@ async function runCheck() {
       return;
     }
 
-    const pagePath = getPagePath(daContext.pathname);
-    // eslint-disable-next-line no-console
-    console.log('[governance] full context:', JSON.stringify(daContext));
-    // eslint-disable-next-line no-console
-    console.log('[governance] resolved pagePath:', pagePath);
-    // eslint-disable-next-line no-console
-    console.log('[governance] rules:', JSON.stringify(rules));
+    const pagePath = getPagePath(daContext.path);
     const rule = findMatchingRule(rules, pagePath);
 
     if (!rule) {
