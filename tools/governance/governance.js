@@ -142,14 +142,10 @@ function runChecks(rule, blockNames, metadata) {
     const ok = blockNames.filter((b) => allowed.includes(b));
 
     if (disallowed.length) {
-      issues.push({
-        category: 'Disallowed Blocks',
-        detail: `${disallowed.length} block(s) not permitted on this path`,
-        items: disallowed,
-      });
+      issues.push({ category: 'Disallowed Blocks', items: disallowed });
     }
     if (ok.length) {
-      passes.push({ category: 'Allowed Blocks', detail: ok.join(', ') });
+      passes.push({ category: 'Allowed Blocks', items: ok });
     }
   }
 
@@ -164,15 +160,44 @@ function runChecks(rule, blockNames, metadata) {
     const present = required.filter((k) => metadata[k]);
 
     if (missing.length) {
-      issues.push({
-        category: 'Missing Metadata',
-        detail: `${missing.length} required field(s) missing or empty`,
-        items: missing,
-      });
+      issues.push({ category: 'Missing Metadata', items: missing });
     }
     if (present.length) {
-      passes.push({ category: 'Required Metadata', detail: present.join(', ') });
+      passes.push({ category: 'Required Metadata', items: present });
     }
+  }
+
+  // Metadata value checks — any column starting with "metadata-"
+  // Allowed values are comma-separated; use "(blank)" to permit an empty value.
+  const metaValueIssues = [];
+  const metaValuePasses = [];
+
+  for (const [key, val] of Object.entries(rule)) {
+    if (!key.startsWith('metadata-')) continue;
+    const field = key.slice('metadata-'.length).toLowerCase();
+    const allowedValues = val.split(',').map((v) => v.trim()).filter(Boolean);
+    const allowBlank = allowedValues.includes('(blank)');
+    const validValues = allowedValues.filter((v) => v !== '(blank)');
+    const actual = (metadata[field] ?? '').trim();
+
+    if (actual === '') {
+      if (allowBlank) {
+        metaValuePasses.push(`${field}: (blank)`);
+      } else {
+        metaValueIssues.push(`${field}: (blank) — allowed: ${validValues.join(', ')}`);
+      }
+    } else if (validValues.includes(actual)) {
+      metaValuePasses.push(`${field}: ${actual}`);
+    } else {
+      metaValueIssues.push(`${field}: "${actual}" — allowed: ${validValues.join(', ')}`);
+    }
+  }
+
+  if (metaValueIssues.length) {
+    issues.push({ category: 'Metadata Values', items: metaValueIssues });
+  }
+  if (metaValuePasses.length) {
+    passes.push({ category: 'Metadata Values', items: metaValuePasses });
   }
 
   return { issues, passes };
@@ -207,7 +232,7 @@ function renderCategory({ label, items, isPass }) {
 function renderResults({ rule, pagePath, issues, passes }) {
   const allCategories = [
     ...issues.map(({ category, items }) => renderCategory({ label: category, items, isPass: false })),
-    ...passes.map(({ category, detail }) => renderCategory({ label: category, items: detail.split(', '), isPass: true })),
+    ...passes.map(({ category, items }) => renderCategory({ label: category, items, isPass: true })),
   ];
 
   resultsEl.innerHTML = `
